@@ -1,5 +1,19 @@
-# 文档仓构建：只出 site/ 构建产物，当前阶段不部署、不上线。
-# main.push 由主仓 ci-contracts 推送 upstream/ 快照时触发（同步方式 A）。
+# 文档仓：CNB 是权威源。main.push 做两件事：
+#   1) 构建 MkDocs 站点（只出 site/ 与 site.tar.gz 产物，当前不部署）
+#   2) 同步到 GitHub 文档仓 h1s97x/altdatahub-docs（未来 GitHub Pages 源）
+# 主仓 ci-contracts 推送 upstream/ 快照时会自动触发本流水线（同步方式 A）。
+#
+# GitHub 侧是纯镜像：不得存在 CNB 没有的文件。将来的 .github/workflows/pages.yml
+# 必须放在本仓（权威源），否则会被 force 同步覆盖。
+# 凭据只在密钥仓库 h1s97x/secret-env（GITHUB_USERNAME / GITHUB_TOKEN），禁止写值。
+
+.git-sync-settings: &git-sync-settings
+  target_url: https://github.com/h1s97x/altdatahub-docs.git
+  auth_type: https
+  username: ${GITHUB_USERNAME}
+  password: ${GITHUB_TOKEN}
+  branch: main
+
 main:
   push:
     - name: build-docs-site
@@ -14,3 +28,15 @@ main:
           script: set -e; python scripts/build_docs.py
         - name: mkdocs build
           script: set -e; mkdocs build --strict; tar -czf site.tar.gz -C site .; ls -lh site.tar.gz
+
+    - name: sync-docs-to-github
+      imports:
+        - https://cnb.cool/h1s97x/secret-env/-/blob/main/env.yml
+      stages:
+        - name: sync to github
+          image: tencentcom/git-sync
+          settings:
+            <<: *git-sync-settings
+            push_tags: true
+            sync_mode: push
+            force: true
