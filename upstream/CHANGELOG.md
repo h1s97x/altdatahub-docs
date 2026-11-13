@@ -136,6 +136,22 @@
   体积、脱敏与中文索引，并接入文档仓 CI 与 GitHub Pages workflow。
 - 新增 `guides/troubleshooting.md`（排障 FAQ）与 `guides/contract-governance.md`（契约治理与分册升版）。
 - `mike` 暂不启用（单版本 + 与 Actions Pages 部署模式冲突），启用条件写入文档仓 README。
+
+**文档站三大板块重组**
+
+- 导航改为 **API 文档 / MCP 文档 / 开发工具**（对齐同类数据服务文档站的信息架构），
+  首页与变更记录保留；旧 `guides/ai-integration.md` 拆成 MCP 总览与部署两页，消除重复。
+- 新增手写页：`api/index.md`（总览与鉴权、统一响应、错误处置、端点速查）、
+  `mcp/index.md`（5 tools / 双 transport / Skill / 诚实口径）、`mcp/deploy.md`（stdio 与
+  Streamable HTTP 配置、环境变量表、客户端示例）、`guides/toolchain.md`（CLI / 7 语言 /
+  门禁 / 生成器 / 镜像 / Token）。
+- `build_docs.py` 由 `capabilities.json` 新增生成 `api/endpoints.md`（5 端点参数表 + curl 示例）
+  与 `mcp/tools.md`（5 tool 的 inputSchema + JSON-RPC 示例）；路由、scope、网关依赖与运行时同源。
+  生成目录与手写页共存的目录只删指定生成文件，不整目录重建。
+- `llms.txt` / `llms-full.txt` 按新栏目重排；`check_site.py` 增列 7 个关键页与板块关键词校验，
+  CNB CI 与 GitHub Pages workflow 两侧都跑。
+- 明确边界：**不提供在线调试台、试用 Token 或公开可调用接口**（在线链路未联调，不做假调试），
+  所有在线示例都标注「未联调 / 缺凭据显式降级」。
 - 砍掉 `parity-results.json` 运行时汇总：静态 PARITY 标记 + 各语言全量参数化 + CI
   已能发现漏接，跨并行 job 传递产物收益不抵复杂度，避免又多一份需同步的生成物。
 

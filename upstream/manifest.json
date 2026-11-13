@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@7c380b1",
+  "source": "altdatahub@4c365f3",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -22,8 +22,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "14a9688e632afd4d7360fe5ee891cc24430d369cb50b75c9c9a6fa921383146d",
-      "bytes": 11482
+      "sha256": "5902e21392305f03c7618c90b9f1c4d500cd63c7803e921bfa86ab127d0b21e5",
+      "bytes": 12794
     },
     {
       "path": "LICENSE",
