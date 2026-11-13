@@ -23,8 +23,8 @@ altdatahub-service/
 
 ## 诚实口径（最重要）
 
-**EDS 网关尚未与真实响应联调**：`docs/api/transport.md` 列的 4 项
-（响应信封、错误码字段名、各产品服务号、`eds_validday` 类型）仍未确认。
+**EDS 网关联调未完成**：响应信封与错误码字段名已确认，`docs/api/transport.md` 仍有 2 项
+（各产品服务号清单、`eds_validday` 类型）未确认，且账号权限待开通。
 `query` 能力在服务端未配置 `EDS_*` 公共参数时返回
 `success=false` + `degrade_reason=未配置 EDS 网关公共参数`。
 
@@ -92,7 +92,7 @@ python -c "import os; print('OK' if os.getenv('ALTDATAHUB_SERVICE_URL') and os.g
 | HTTP 401 | 调用方 Token 无效/被吊销 | 找管理员重签，不重试 |
 | HTTP 403 | scope 不足或来源 IP 不在白名单 | 说明权限边界 |
 | HTTP 429 | 触发限流 | 稍后重试 |
-| `category=contract` | 响应信封未按预期解析 | 网关未联调，报告待确认 |
+| `category=contract` | 响应信封未按预期解析 | 核对网关报文结构 |
 | `category=upstream` | 网关网络/业务错误 | 看 `retryable` 决定有界重试 |
 | `code=2000` | 数据量超阈值 | 加 `page` / `pageSize`，**不要重试同一请求**（可能重复计费） |
 | `code=3000` | 账户无该接口权限 | 核对服务号是否开通 |

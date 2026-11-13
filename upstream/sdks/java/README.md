@@ -92,5 +92,6 @@ List<Types.S0101BasicProfile> live = client.enterpriseBasic(Map.of(
 
 ## 未确认项
 
-响应信封形状、错误码字段名、部分产品的业务参数 —— 与 Python 版共享同一批未知，
+响应信封（`data[].data`）与错误码字段名（`code` / `msg`）已确认；仍待确认服务号清单、
+`eds_validday` 类型原文 —— 与 Python 版共享同一批未知，
 详见 [`docs/api/transport.md`](../../docs/api/transport.md)。

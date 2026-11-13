@@ -2,17 +2,17 @@
   "version": 1,
   "note": "能力、路由、MCP tool、Skill 命令与降级口径的唯一真源。错误码不在此复制，运行时/文档从 src/altdatahub/errors.py 的 EDS_ERROR_CODES 读取。派生文件由 tools/verify.py sync 生成，勿手改。",
   "errorCodeSource": "src/altdatahub/errors.py:EDS_ERROR_CODES",
-  "gatewayNote": "EDS 网关尚未与真实响应联调：响应信封（数据行所在层级）、错误码字段名、各产品服务号仍未确认，见 docs/api/transport.md。请勿把空数据当作「确无记录」。",
+  "gatewayNote": "EDS 网关联调未完成：已取得真实错误响应与门户成功响应样例，响应信封（data[].data）与错误码字段名（code / msg）已确认；各产品服务号清单仍待确认，且账号权限尚未开通、尚无一次成功的在线查询，见 docs/api/transport.md。请勿把空数据当作「确无记录」。",
   "degradeReasons": {
     "configuration": "未配置 EDS 网关公共参数",
     "validation": "请求参数不合法",
-    "contract": "响应信封未按预期解析（未联调）",
+    "contract": "响应信封未按预期解析",
     "transport": "网关网络/传输失败",
     "pending": "传输契约待接入"
   },
   "policyRows": [
     { "label": "category=configuration", "category": "配置", "retryable": "否", "hint": "服务端补 EDS_*" },
-    { "label": "category=contract", "category": "契约", "retryable": "否", "hint": "响应信封未联调，报告待确认" },
+    { "label": "category=contract", "category": "契约", "retryable": "否", "hint": "核对网关报文结构与字段名" },
     { "label": "category=upstream", "category": "上游", "retryable": "看 retryable", "hint": "按指示退避" },
     { "label": "HTTP 401", "category": "鉴权", "retryable": "否", "hint": "调用方 Token 无效/被吊销，重新签发" },
     { "label": "HTTP 403", "category": "鉴权 / ACL", "retryable": "否", "hint": "scope 不足或来源 IP 不在白名单" },

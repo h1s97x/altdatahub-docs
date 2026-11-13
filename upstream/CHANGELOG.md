@@ -35,6 +35,20 @@
   已被 `.gitignore` 忽略、不入库，也不出网。后续联调只依据截图人工转写结构，
   不要求回传原始报文。
 
+### 契约收敛（向量 v3，依据截图人工转写占位夹具）
+
+- `contract/vectors.json` 升 v3（29 case）：新增真实错误响应 `code` / `msg` / `data` 空串、
+  成功码 `"0000"`、以及 `data[].data` 单主体 / 多主体 / 空结果三种展平 case；
+  7 个 consumer 同步 `PARITY_VECTOR_VERSION: 3`。
+- 7 语言 `extract_rows` 与客户端层统一支持 `data[].data` 展平（多主体按顺序合并），
+  取不到嵌套层时回退旧候选路径；修复「主体外壳被当数据行、业务字段静默为 `None`」。
+- 错误码键名真实值确认为 `code` / `msg`；实现保留「键名含 code + 值命中码表」的容错，
+  兼容 `returnCode` 等历史字段名。
+- `docs/api/transport.md` 未确认项由 4 项收敛为 2 项（各产品服务号清单、`eds_validday` 类型原文）；
+  生成器模板、能力注册表与全部 README 口径同步，`verify.py sync --write` 重写派生文件。
+- 回归：Python 128 / TypeScript 72 / Java 76 / Go 全过 / C 252 / C++ 43 / service 40 /
+  `verify.py all` 全绿。C# 与 Rust 本地工具链缺失，未编译验证（CI 覆盖）。
+
 ## [0.1.0] - 2026-11-13
 
 ### 新增

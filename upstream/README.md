@@ -6,7 +6,7 @@
 
 数据契约来自《替代数据通 产品数据分册（V1.0）》（中国人民银行征信中心，2025-12）；
 传输契约按《接口规范》示例代码实现（POST + 8 个 `eds_*` 公共参数 + 业务参数平铺，
-**无签名**，鉴权靠 `eds_account`）。响应信封与业务错误码仍待真实响应确认 —— 见「诚实口径」。
+**无签名**，鉴权靠 `eds_account`）。响应信封与业务错误码已由真实响应确认 —— 见「诚实口径」。
 
 ## 诚实口径
 
@@ -17,10 +17,10 @@
 | 10 个大类方法 + `productCode` 枚举 | ✅ 可用 | 类别与编码不匹配时**本地**报错 |
 | 传输层（POST 到 EDS 网关） | ✅ 已实现 | 按《接口规范》示例代码逐字段对齐；**未与真实网关联调** |
 | 业务错误码（1000/2000/3000/9999） | ✅ 已实现 | 按值判定，带 `category` / `retryable` / `hint`，OpenAPI 有 `x-error-codes` |
-| 响应信封 | ⏳ 未确认 | 数据行位置按候选路径试；错误码字段名按「含 code 的键」找 |
+| 响应信封 | ✅ 已确认 | `data[].data` 两层按展平解包；错误码 `code` / 描述 `msg` |
 | **能力服务 / MCP / Skill** | ✅ 骨架可用 | 独立部署的 HTTP 服务 + AI 接入层；**离线目录能力完全可用，在线查询仍需 `EDS_*` 凭据与一次真实响应联调**，见下节 |
 
-仍未确认 4 项：响应信封、错误码字段名、各产品服务号、`eds_validday` 类型注释，详见
+仍未确认 2 项：各产品服务号清单、`eds_validday` 类型原文，详见
 [`docs/api/transport.md`](docs/api/transport.md)。**没有签名环节** —— 示例代码里鉴权只靠
 `eds_account` 授权串，本 SDK 不发明签名字段。
 
@@ -300,7 +300,7 @@ docker compose -f service/compose.yml --env-file .env up -d --build   # 只绑�
 | MCP | `mcp/README.md` | `python -m mcp`（stdio）或 `python -m mcp --http`（`POST /mcp`） |
 | Agent Skill | `skills/altdatahub-service/SKILL.md` | 先查目录定 productCode，再查字段字典，最后才发在线查询 |
 
-**在线查询仍是显式降级**：EDS 网关尚未与真实响应联调，服务端没配 `EDS_*`
+**在线查询仍是显式降级**：EDS 网关联调未完成（账号权限待开通），服务端没配 `EDS_*`
 时返回 `success=false` + `degrade_reason=未配置 EDS 网关公共参数`，不伪造数据。
 拿到凭据与一份真实响应后，需按 `docs/api/transport.md` 把信封 / 服务号钉死。
 调用方只持服务地址 + 调用方 Token，`EDS_ACCOUNT` 等 8 个公共参数只在服务端。

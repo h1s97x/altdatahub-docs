@@ -26,8 +26,8 @@
 
 ## 诚实口径
 
-EDS 网关**尚未与真实响应联调**：`docs/api/transport.md` 列的 4 项
-（响应信封 / 错误码字段名 / 服务号 / `eds_validday` 类型）未确认。
+EDS 网关**联调未完成**：响应信封（`data[].data`）与错误码字段名（`code` / `msg`）已确认，
+`docs/api/transport.md` 仍有 2 项未确认（服务号清单 / `eds_validday` 类型），且账号权限待开通。
 `altdatahub_query` 在未配置 `EDS_*` 时返回 `isError=true` 的**文本结果**，
 内容含 `degrade_reason: 未配置 EDS 网关公共参数` 与 `note`，模型应如实告知
 用户「数据源未接入」，**不能把降级当空数据，更不能编造记录**。

@@ -100,7 +100,7 @@ int main(void) {
 | 组 | 数量 | 校验内容 |
 |---|---|---|
 | `payload` | 4 | 8 个 `eds_*` 公共参数 + 业务参数同层平铺、`validDay` 覆盖、`eds_` 前缀拒绝 |
-| `errors` | 7 | 业务码按值判定、`category` / `retryable`、业务数据里的 `xxxCode` 不误判 |
-| `extract` | 9 | 5 种响应信封候选路径、顶层数组、空数组、找不到数据行时报错 |
+| `errors` | 11 | 业务码按值判定、`category` / `retryable`、业务数据里的 `xxxCode` 不误判 |
+| `extract` | 14 | 5 种回退候选路径、`data[].data` 展平、顶层数组、空数组、找不到数据行时报错 |
 
 改 `contract/vectors.json` 等于改契约，必须**所有语言同时跑通**。

@@ -9,10 +9,10 @@
 | 能力 | 状态 |
 |---|---|
 | `/v1/categories`、`/v1/catalog`、`/v1/schema/{code}` | ✅ **完全可用**，纯离线产品目录，不需要网关 |
-| `/v1/query/{code}` | ⚠️ 代码路径完整，但 **EDS 网关尚未与真实响应联调** |
+| `/v1/query/{code}` | ⚠️ 代码路径完整，但 **EDS 网关联调未完成（权限待开通，尚无一次成功在线查询）** |
 
-仓库 `docs/api/transport.md` 列了 4 项未确认：响应信封（数据行在哪一层）、
-错误码字段名、51 个产品的服务号、`eds_validday` 类型。**没有 `EDS_*` 凭据时，
+仓库 `docs/api/transport.md` 已确认响应信封（`data[].data`）与错误码字段名（`code` / `msg`），
+仍有 2 项未确认：51 个产品的服务号清单、`eds_validday` 类型原文。**没有 `EDS_*` 凭据时，
 在线查询返回 `success=false` + `degrade_reason`，不会伪造数据**；拿到凭据后
 仍需一次真实响应才能把信封/服务号钉死。
 
@@ -133,7 +133,7 @@ docker run --rm --env-file /tmp/ah-probe.env \
 以及 SDK 当前用 `check_error` / `extract_rows` 得到的解释结果；stdout 只报路径与字节数。
 
 回传样例前请**自行脱敏响应里的业务数据，但保留信封层级与字段名** —— 要靠它钉死
-4 项：数据行位置、错误码字段名、51 个服务号、`eds_validday` 类型；另有 2 项
+2 项：51 个服务号清单、`eds_validday` 类型原文；另有 2 项
 （是否共用 URL、`page/pageSize` 是否要求数字）可用同一探针换参数验证。
 本地若只需自建镜像：`docker buildx build --platform linux/arm64 -f service/Dockerfile -t altdatahub-service:arm64 .`。
 

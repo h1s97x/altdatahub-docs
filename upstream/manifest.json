@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@4c365f3",
+  "source": "altdatahub@a200c9a",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -9,21 +9,21 @@
     "structureFields": 397,
     "requestParams": 2
   },
-  "vectorsVersion": 2,
-  "generatorSha256": "21c03dec3c996f436293f808485d32a9b847e90d3fee1a5672c6d1334ca4be9b",
+  "vectorsVersion": 3,
+  "generatorSha256": "78dfa53d3068df63b28ce4d1fc92c024b56841845e906ef4eef7069a1edc0c33",
   "redactions": [
     "\\b80\\.37\\.0\\.103\\b -> <EDS_HOST>"
   ],
   "files": [
     {
       "path": "README.md",
-      "sha256": "42c2d294124dd4f748b1f4fd86734fbbdcbb61e7303ac2c28a80c76cf6558d30",
-      "bytes": 16786
+      "sha256": "9e4f246f596c6b55c19b1062e05ea13463b4ba3b1e732e00acec90371e5be8c3",
+      "bytes": 16759
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "5902e21392305f03c7618c90b9f1c4d500cd63c7803e921bfa86ab127d0b21e5",
-      "bytes": 12794
+      "sha256": "e3c1281daffdb1f981605aeb731ca05da9ea811aef2a525d217b3f6913cefb59",
+      "bytes": 13944
     },
     {
       "path": "LICENSE",
@@ -37,8 +37,8 @@
     },
     {
       "path": "docs/api/transport.md",
-      "sha256": "f748e919d1be9728c4da1d90966de6049cf1cc189964e4fb7f12eb82c6b9c20c",
-      "bytes": 5039
+      "sha256": "cbdc32ea7b2118ea6b1202e8e6eae5429efaa4bf17bf5f3ab36fa9dfecad16c6",
+      "bytes": 5902
     },
     {
       "path": "catalog/PRODUCTS.md",
@@ -47,63 +47,63 @@
     },
     {
       "path": "openapi/service.yaml",
-      "sha256": "019336644a0121f1a74fd6d5ca12f7ea974654842bdd901bbd656780a9647f72",
-      "bytes": 7358
+      "sha256": "42449ac9cc1928001801e692fc72f497bebcb63e52c373077d48449aa86166a5",
+      "bytes": 7394
     },
     {
       "path": "contract/capabilities.json",
-      "sha256": "5eb6456ca102b664f5a9a0722df9e2fd6d98125e87d516907bc962ffa21c2347",
-      "bytes": 5293
+      "sha256": "b600532cbf367f0e59029705a0922e96888b43a5001d27ebc1ec217a232df3c9",
+      "bytes": 5407
     },
     {
       "path": "service/README.md",
-      "sha256": "a685514d8c783df5cb33cd1eede6335a55048b6c0f4a3b34535b0e92019a5206",
-      "bytes": 10860
+      "sha256": "786cad94bd47fa94020cf47444120eebafbbf20cf945bf03f432d91d8af6f621",
+      "bytes": 10908
     },
     {
       "path": "mcp/README.md",
-      "sha256": "f1a4715f24e3c1d8fbdba2477d037b14a9f5f9d64cef45260ef7a17308dbd993",
-      "bytes": 4301
+      "sha256": "5a700260cd3e05e73635a1397f06722804e94ceb6cc6cdc296a76a741a30a903",
+      "bytes": 4370
     },
     {
       "path": "skills/altdatahub-service/SKILL.md",
-      "sha256": "499516220915ce24109cc5c93bc75a63b07cea22e28e6b2e5c5ff61214be294e",
-      "bytes": 5374
+      "sha256": "5696b3333efb2cad4ad74c1b9c08718b5696c4b3304eecd236db646d8bddc68d",
+      "bytes": 5392
     },
     {
       "path": "skills/altdatahub-service/references/catalog.md",
-      "sha256": "e85e0f46637b1ac556e66456bad651caec674a998fa7ac88a7129b70a16ebcee",
-      "bytes": 4451
+      "sha256": "417574032ec88597dc20d1ebf290e397abc39318785d110fdb268e3ccbd457d8",
+      "bytes": 4376
     },
     {
       "path": "sdks/typescript/README.md",
-      "sha256": "18ad40c08da2d758f8e28a87d80a48578cc0873996821ed55ab3f2f975e13420",
-      "bytes": 3019
+      "sha256": "4a1faebed535a4424a98c1705a0ba0114ac7edb6e659c32a136e95d5c064688e",
+      "bytes": 3092
     },
     {
       "path": "sdks/java/README.md",
-      "sha256": "cc28639aacff8f0af510afffa2ee62a475427536b1291820660abdbc199abfe6",
-      "bytes": 4480
+      "sha256": "db19545e6b38448687e5d43a8c9dce48ae88ab33e7b3d653fb37b4400d7647a7",
+      "bytes": 4553
     },
     {
       "path": "sdks/go/README.md",
-      "sha256": "22a3307d27d91ca2e6554698a501a1869ce4c4ee3cbe845f9d11ae14a4fce923",
-      "bytes": 4007
+      "sha256": "d3f8fe6eeac79ce9e8a142ef15f7d0081e32a88a4919f128c5fe3d12917fd5aa",
+      "bytes": 4080
     },
     {
       "path": "sdks/csharp/README.md",
-      "sha256": "2b95f1c1e7d23a0dddf1f93bf1c5474484ec11bda3cd77fcdac3ccf2b40648e2",
-      "bytes": 4120
+      "sha256": "18feafe2fa9d8dc514a26b839228b523a1c858c76daa055bf149175ba0362035",
+      "bytes": 4193
     },
     {
       "path": "sdks/rust/README.md",
-      "sha256": "50e4c73303b9a732e4996c497391b2e3a6a107a7245332585b4be9377c56b7d8",
-      "bytes": 4285
+      "sha256": "b0e8b26c4a4e39615fee8db8ecebf8a26381bac6dcbc953ea39d66a0a7594230",
+      "bytes": 4358
     },
     {
       "path": "sdks/c/README.md",
-      "sha256": "53e1ad79dae9b44147d040c07e8350bc9eb8501a229c82b275baad191f01a0b8",
-      "bytes": 4273
+      "sha256": "d09ffba3b3b863f82f3449371f816d54129af31720ec4dbbb0f6885acdce0982",
+      "bytes": 4292
     },
     {
       "path": "sdks/cpp/README.md",

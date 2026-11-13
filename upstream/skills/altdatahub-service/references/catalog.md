@@ -34,12 +34,11 @@
 
 ## 在线查询的诚实口径
 
-`docs/api/transport.md` 列了 4 项未确认：
+`docs/api/transport.md` 已确认响应信封（`data[].data` 两层）与错误码字段名（`code` / `msg`），
+仍有 2 项未确认：
 
-1. 响应信封：数据行在 `data` / `resultData` / `resultData.data` / `data.list` 哪一层
-2. 错误码放在哪个字段，信封是否包一层
-3. 各产品服务号（前缀 `izxzx`，其余 50 个是否同为 `izxzx<productCode>`）
-4. `eds_validday` 的类型注释被截断（当前按示例代码传数字 `0`）
+1. 各产品服务号（前缀 `izxzx`，其余 50 个是否同为 `izxzx<productCode>`）
+2. `eds_validday` 的类型注释被截断（当前按示例代码传数字 `0`）
 
 另外 2 项未验证：是否所有产品共用同一 URL；`page`/`pageSize` 是否要求数字。
 
@@ -53,7 +52,7 @@
   "retryable": false,
   "degrade_reason": "未配置 EDS 网关公共参数",
   "hint": "在服务端 .env 配置 EDS_BASE_URL / EDS_ACCOUNT / …",
-  "note": "EDS 网关尚未与真实响应联调…"
+  "note": "EDS 网关联调未完成…"
 }
 ```
 
@@ -70,7 +69,7 @@
 | `3000` | authentication | 否 | 该账户无此接口权限：核对 eds_account 授权串与 eds_transcode 的服务号是否已开通。 |
 | `9999` | upstream | 是 | 上游系统错误：有界退避重试（建议 3 次、2^n×500ms），仍失败再报。 |
 | `category=configuration` | 配置 | 否 | 服务端补 EDS_* |
-| `category=contract` | 契约 | 否 | 响应信封未联调，报告待确认 |
+| `category=contract` | 契约 | 否 | 核对网关报文结构与字段名 |
 | `category=upstream` | 上游 | 看 retryable | 按指示退避 |
 | `HTTP 401` | 鉴权 | 否 | 调用方 Token 无效/被吊销，重新签发 |
 | `HTTP 403` | 鉴权 / ACL | 否 | scope 不足或来源 IP 不在白名单 |
