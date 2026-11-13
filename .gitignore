@@ -1,0 +1,13 @@
+site/
+.cache/
+site.tar.gz
+__pycache__/
+*.py[cod]
+
+# build_docs.py 生成物（CI 每次从 upstream/ 重建，不入库）
+docs/contract/
+docs/reference/
+docs/changelog.md
+docs/llms.txt
+docs/llms-full.txt
+docs/assets/

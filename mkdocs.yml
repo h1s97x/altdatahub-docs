@@ -1,0 +1,48 @@
+site_name: altdatahub 文档
+site_description: 金融信用信息基础数据库替代数据通 第三方 SDK 与能力服务文档
+strict: true
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+extra:
+  generator: false
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+plugins:
+  - search
+
+nav:
+  - 首页: index.md
+  - 快速开始:
+      - 安装与离线 CLI: getting-started/install.md
+  - 使用指南:
+      - Python SDK: guides/python.md
+      - 多语言 SDK: guides/sdks.md
+  - 契约:
+      - 数据 / 传输 / 错误码: contract/index.md
+      - 原始文档镜像: reference/index.md
+  - 变更记录: changelog.md

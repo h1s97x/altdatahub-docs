@@ -1,0 +1,16 @@
+# 文档仓构建：只出 site/ 构建产物，当前阶段不部署、不上线。
+# main.push 由主仓 ci-contracts 推送 upstream/ 快照时触发（同步方式 A）。
+main:
+  push:
+    - name: build-docs-site
+      docker:
+        image: python:3.12
+      stages:
+        - name: install
+          script: set -e; python -m pip install -q -r requirements.txt
+        - name: verify snapshot
+          script: set -e; python scripts/build_docs.py --check
+        - name: render pages
+          script: set -e; python scripts/build_docs.py
+        - name: mkdocs build
+          script: set -e; mkdocs build --strict; tar -czf site.tar.gz -C site .; ls -lh site.tar.gz

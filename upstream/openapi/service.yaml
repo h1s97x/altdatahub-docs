@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: altdatahub 能力服务（对外契约）
+  version: 0.1.0
+  description: >
+    调用方视角的「能力级」契约，与 openapi/openapi.yaml 的 51 个服务商逻辑接口
+    /products/{code} 不同。本服务把离线产品目录与通用查询收敛成 5 个端点，
+    EDS 网关公共参数（8 个 eds_*）只在服务端，**无签名**，凭据不外泄。
+    诚实口径：EDS 网关尚未与真实响应联调，响应信封 / 错误码字段名 / 各产品服务号
+    仍未确认，见 docs/api/transport.md；在线查询失败时返回结构化降级，不伪造数据。
+servers:
+  - url: http://altdatahub-service:8802
+    description: 内网 compose 网络（生产形态，不发布端口）
+  - url: http://127.0.0.1:8802
+    description: 本机调试
+security:
+  - BearerAuth: []
+paths:
+  /v1/ping:
+    get:
+      operationId: ping
+      summary: 健康检查（不鉴权）
+      security: []
+      responses:
+        "200":
+          description: 服务信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  service: { type: string }
+                  capabilities: { type: array, items: { type: string } }
+                  catalog_offline: { type: boolean }
+                  gateway_contract_status: { type: string }
+  /healthz:
+    get:
+      operationId: healthz
+      summary: 同 /v1/ping
+      security: []
+      responses:
+        "200": { description: OK }
+  /v1/categories:
+    get:
+      operationId: categories
+      summary: 10 个产品大类（离线，不需要 EDS 网关）
+      responses:
+        "200":
+          description: 大类清单
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      count: { type: integer }
+                      categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key: { type: string }
+                            name: { type: string }
+                            section_id: { type: integer }
+                            section_name: { type: string }
+                            description: { type: string }
+                            product_count: { type: integer }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v1/catalog:
+    get:
+      operationId: catalog
+      summary: 产品清单（离线）；只给摘要，不倒全量字段字典
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema: { type: string }
+          description: 大类 key，如 judicial；省略则返回全部 51 个产品
+      responses:
+        "200":
+          description: 产品摘要清单
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      count: { type: integer }
+                      products:
+                        type: array
+                        items: { $ref: "#/components/schemas/ProductBrief" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/schema/{productCode}:
+    get:
+      operationId: schema
+      summary: 单个产品的字段字典（离线）
+      parameters:
+        - name: productCode
+          in: path
+          required: true
+          schema: { type: string, example: S0101 }
+      responses:
+        "200":
+          description: 字段字典
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    allOf:
+                      - { $ref: "#/components/schemas/ProductBrief" }
+                      - type: object
+                        properties:
+                          category: { type: string }
+                          fields: { type: array, items: { type: object } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/query/{productCode}:
+    post:
+      operationId: query
+      summary: 通用查询（在线，需服务端配置 EDS_* 公共参数）
+      description: >
+        请求体是**平铺的业务参数**（如 entName / page / pageSize）；
+        8 个 eds_* 公共参数由服务端注入，业务参数含 eds_ 前缀会被拒绝。
+        参数名只允许标识符字符、值必须是标量（最多 40 个 / 8000 字符）；
+        productCode 由 catalog 白名单校验，category 由大类 key 白名单校验。
+        未配置凭据时按 SDK 的 ENV_MAP 只报告缺失变量名；
+        网关不可达时返回 success=false + degrade_reason，不伪造数据。
+      parameters:
+        - name: productCode
+          in: path
+          required: true
+          schema: { type: string, example: S0101 }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              example: { entName: "贵州茅台", page: "1", pageSize: "20" }
+      responses:
+        "200":
+          description: 成功或结构化降级（都走 HTTP 200，看 success 字段）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/QueryResponse" }
+        "400": { description: 请求体不是 JSON 对象 }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { description: 触发限流 }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 由 service/issue_token.py 签发的调用方 Token（注册表只存哈希）
+  schemas:
+    ProductBrief:
+      type: object
+      properties:
+        product_code: { type: string }
+        name: { type: string }
+        section_id: { type: integer }
+        section_name: { type: string }
+        field_count: { type: integer }
+        structure_names: { type: array, items: { type: string } }
+    QueryResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            product_code: { type: string }
+            product_name: { type: string }
+            category: { type: string }
+            row_count: { type: integer }
+            rows: { type: array, items: { type: object } }
+        error: { type: string }
+        category: { type: string }
+        retryable: { type: boolean }
+        degrade_reason: { type: string }
+        hint: { type: string }
+        note: { type: string }
+  responses:
+    Unauthorized:
+      description: Token 缺失 / 无效 / 已吊销
+    Forbidden:
+      description: 来源 IP 不在白名单，或 Token 的 scopes 不含该能力

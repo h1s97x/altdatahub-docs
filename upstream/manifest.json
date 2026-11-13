@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "source": "altdatahub@01ca587",
+  "generatedBy": "tools/verify.py export",
+  "catalog": {
+    "products": 51,
+    "topFields": 557,
+    "structures": 12,
+    "structureFields": 397,
+    "requestParams": 2
+  },
+  "vectorsVersion": 1,
+  "generatorSha256": "21c03dec3c996f436293f808485d32a9b847e90d3fee1a5672c6d1334ca4be9b",
+  "redactions": [
+    "\\b80\\.37\\.0\\.103\\b -> <EDS_HOST>"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "414b897f346e86965f8e074e55edcdd041feadb16f7a93c09899d1e32f15c567",
+      "bytes": 16565
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "7ec482ebab42177f4a7271ae29e4bc71a9ec79432b6a3f4c9bd5d74382a2ba9d",
+      "bytes": 3336
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "db06e8ac0da4903b4f5bf866fab96f006096ca190a171a6e080ccbdd498d1bc9",
+      "bytes": 1080
+    },
+    {
+      "path": "docs/catalog.md",
+      "sha256": "3212dd8fd34bcace08467b0a0c3df3e6e9038b74d77f65e6ebb6bc6a023a39c7",
+      "bytes": 4114
+    },
+    {
+      "path": "docs/api/transport.md",
+      "sha256": "f748e919d1be9728c4da1d90966de6049cf1cc189964e4fb7f12eb82c6b9c20c",
+      "bytes": 5039
+    },
+    {
+      "path": "catalog/PRODUCTS.md",
+      "sha256": "0a04252355e84477e780e39f8043355ae04fd68f06368fe6bd774d94d5ff90fa",
+      "bytes": 5955
+    },
+    {
+      "path": "openapi/service.yaml",
+      "sha256": "019336644a0121f1a74fd6d5ca12f7ea974654842bdd901bbd656780a9647f72",
+      "bytes": 7358
+    },
+    {
+      "path": "service/README.md",
+      "sha256": "734b2acb84ba367e8f7a0617b6f54ce6ce73074d38e30d49ca9e0b94a891b741",
+      "bytes": 4915
+    },
+    {
+      "path": "mcp/README.md",
+      "sha256": "f1a4715f24e3c1d8fbdba2477d037b14a9f5f9d64cef45260ef7a17308dbd993",
+      "bytes": 4301
+    },
+    {
+      "path": "skills/altdatahub-service/SKILL.md",
+      "sha256": "499516220915ce24109cc5c93bc75a63b07cea22e28e6b2e5c5ff61214be294e",
+      "bytes": 5374
+    },
+    {
+      "path": "skills/altdatahub-service/references/catalog.md",
+      "sha256": "d0d9ccec2716ea59a7d3646672a378ef8720360e16a7227417e3e34090196458",
+      "bytes": 4021
+    },
+    {
+      "path": "sdks/typescript/README.md",
+      "sha256": "18ad40c08da2d758f8e28a87d80a48578cc0873996821ed55ab3f2f975e13420",
+      "bytes": 3019
+    },
+    {
+      "path": "sdks/java/README.md",
+      "sha256": "cc28639aacff8f0af510afffa2ee62a475427536b1291820660abdbc199abfe6",
+      "bytes": 4480
+    },
+    {
+      "path": "sdks/go/README.md",
+      "sha256": "22a3307d27d91ca2e6554698a501a1869ce4c4ee3cbe845f9d11ae14a4fce923",
+      "bytes": 4007
+    },
+    {
+      "path": "sdks/csharp/README.md",
+      "sha256": "2b95f1c1e7d23a0dddf1f93bf1c5474484ec11bda3cd77fcdac3ccf2b40648e2",
+      "bytes": 4120
+    },
+    {
+      "path": "sdks/rust/README.md",
+      "sha256": "50e4c73303b9a732e4996c497391b2e3a6a107a7245332585b4be9377c56b7d8",
+      "bytes": 4285
+    },
+    {
+      "path": "sdks/c/README.md",
+      "sha256": "53e1ad79dae9b44147d040c07e8350bc9eb8501a229c82b275baad191f01a0b8",
+      "bytes": 4273
+    },
+    {
+      "path": "sdks/cpp/README.md",
+      "sha256": "bd91c8fc6b6e7437c36bca309519c1c0633912e022b379e9d8723e261221dd18",
+      "bytes": 4475
+    }
+  ]
+}
