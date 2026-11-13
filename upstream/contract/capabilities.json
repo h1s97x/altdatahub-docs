@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "note": "能力、路由、MCP tool、Skill 命令与降级口径的唯一真源。错误码不在此复制，运行时/文档从 src/altdatahub/errors.py 的 EDS_ERROR_CODES 读取。派生文件由 tools/verify.py sync 生成，勿手改。",
+  "errorCodeSource": "src/altdatahub/errors.py:EDS_ERROR_CODES",
+  "gatewayNote": "EDS 网关尚未与真实响应联调：响应信封（数据行所在层级）、错误码字段名、各产品服务号仍未确认，见 docs/api/transport.md。请勿把空数据当作「确无记录」。",
+  "degradeReasons": {
+    "configuration": "未配置 EDS 网关公共参数",
+    "validation": "请求参数不合法",
+    "contract": "响应信封未按预期解析（未联调）",
+    "transport": "网关网络/传输失败",
+    "pending": "传输契约待接入"
+  },
+  "policyRows": [
+    { "label": "category=configuration", "category": "配置", "retryable": "否", "hint": "服务端补 EDS_*" },
+    { "label": "category=contract", "category": "契约", "retryable": "否", "hint": "响应信封未联调，报告待确认" },
+    { "label": "category=upstream", "category": "上游", "retryable": "看 retryable", "hint": "按指示退避" },
+    { "label": "HTTP 401", "category": "鉴权", "retryable": "否", "hint": "调用方 Token 无效/被吊销，重新签发" },
+    { "label": "HTTP 403", "category": "鉴权 / ACL", "retryable": "否", "hint": "scope 不足或来源 IP 不在白名单" },
+    { "label": "HTTP 429", "category": "限流", "retryable": "是", "hint": "稍后重试" }
+  ],
+  "capabilities": [
+    {
+      "id": "categories",
+      "method": "GET",
+      "path": "/v1/categories",
+      "pathTemplate": "/v1/categories",
+      "handler": "categories",
+      "argKind": "none",
+      "requiresGateway": false,
+      "auth": true,
+      "scope": "categories",
+      "mcpTool": "altdatahub_categories",
+      "mcpDescription": "列出 10 个产品大类（离线，无需 EDS 网关）",
+      "mcpInputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
+      "skillCommand": "--capability categories",
+      "summary": "列出 10 个产品大类",
+      "gatewayLabel": "不需要"
+    },
+    {
+      "id": "catalog",
+      "method": "GET",
+      "path": "/v1/catalog",
+      "pathTemplate": "/v1/catalog",
+      "handler": "catalog_products",
+      "argKind": "category",
+      "requiresGateway": false,
+      "auth": true,
+      "scope": "catalog",
+      "mcpTool": "altdatahub_catalog",
+      "mcpDescription": "列出产品清单；可按大类过滤（离线）",
+      "mcpInputSchema": {
+        "type": "object",
+        "properties": { "category": { "type": "string", "description": "大类 key，如 judicial；省略返回全部 51 个产品" } },
+        "additionalProperties": false
+      },
+      "skillCommand": "--capability catalog",
+      "summary": "列出产品清单（可按大类过滤）",
+      "gatewayLabel": "不需要"
+    },
+    {
+      "id": "schema",
+      "method": "GET",
+      "path": "/v1/schema",
+      "pathTemplate": "/v1/schema/{productCode}",
+      "handler": "schema",
+      "argKind": "product_code",
+      "requiresGateway": false,
+      "auth": true,
+      "scope": "schema",
+      "mcpTool": "altdatahub_schema",
+      "mcpDescription": "查看单个 productCode 的字段字典（离线）",
+      "mcpInputSchema": {
+        "type": "object",
+        "properties": { "product_code": { "type": "string", "description": "productCode，如 S0101" } },
+        "required": ["product_code"],
+        "additionalProperties": false
+      },
+      "skillCommand": "--capability schema",
+      "summary": "查看单个 productCode 的字段字典",
+      "gatewayLabel": "不需要"
+    },
+    {
+      "id": "query",
+      "method": "POST",
+      "path": "/v1/query",
+      "pathTemplate": "/v1/query/{productCode}",
+      "handler": "query",
+      "argKind": "query_body",
+      "requiresGateway": true,
+      "auth": true,
+      "scope": "query",
+      "mcpTool": "altdatahub_query",
+      "mcpDescription": "按 productCode 查询数据（在线，需服务端 EDS 凭据）",
+      "mcpInputSchema": {
+        "type": "object",
+        "properties": {
+          "product_code": { "type": "string", "description": "productCode，如 S0101；先用 catalog/schema 确认" },
+          "params": { "type": "object", "description": "平铺业务参数，如 {\"entName\":\"贵州茅台\"}；不许含 eds_ 前缀" }
+        },
+        "required": ["product_code"],
+        "additionalProperties": false
+      },
+      "skillCommand": "--capability query",
+      "summary": "按 productCode 查询数据",
+      "gatewayLabel": "需要 EDS_*"
+    },
+    {
+      "id": "ping",
+      "method": "GET",
+      "path": "/v1/ping",
+      "pathTemplate": "/v1/ping",
+      "handler": null,
+      "argKind": "none",
+      "requiresGateway": false,
+      "auth": false,
+      "scope": null,
+      "mcpTool": "altdatahub_ping",
+      "mcpDescription": "检查能力服务是否可达（不鉴权）",
+      "mcpInputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
+      "skillCommand": "--capability ping",
+      "summary": "检查能力服务是否可达",
+      "gatewayLabel": "不需要"
+    }
+  ]
+}
