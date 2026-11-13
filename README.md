@@ -30,6 +30,8 @@ mkdocs build --strict        # 产物在 site/
 
 - 离线目录能力（产品目录、字段字典）**完全可用**；
 - 在线查询**尚未与真实 EDS 网关联调**，缺凭据时服务端显式降级，**不伪造数据**；
-- 本仓当前**只出构建产物，不部署上线**；GitHub Pages 配置留待后续决定。
+- 本仓是**权威源**：`main.push` 由 `.github/workflows/pages.yml` 构建并发布到 GitHub Pages；
+  `sync-docs-to-github` 先把本仓 force 同步到 GitHub 文档仓，再由那边的 Actions 部署。
+  因此 Pages workflow 必须放在本仓，只写在 GitHub 侧会被同步覆盖。
 
 本项目是第三方实现，非征信中心官方发布，与征信中心无隶属关系。

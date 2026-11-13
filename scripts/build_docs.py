@@ -25,6 +25,7 @@ ASSETS = DOCS / "assets"
 GENERATED_DIRS = (DOCS / "contract", DOCS / "reference", ASSETS)
 GENERATED_FILES = (DOCS / "changelog.md", DOCS / "llms.txt", DOCS / "llms-full.txt")
 HEADER = "<!-- 由 scripts/build_docs.py 从 upstream/ 生成，勿手改 -->\n\n"
+CAPABILITIES_REL = "contract/capabilities.json"
 # 主仓快照已脱敏；这里是第二道防线，防止脱敏规则失效后把内网地址发布出去。
 SENSITIVE = re.compile(r"\b80\.37\.0\.103\b|https?://(?!127\.0\.0\.1|0\.0\.0\.0)\d{1,3}(?:\.\d{1,3}){3}")
 
@@ -48,11 +49,64 @@ def verify(manifest: dict) -> list[str]:
         hit = SENSITIVE.search(content)
         if hit:
             problems.append(f"未脱敏内容：{rel} -> {hit.group(0)}")
+        if rel == CAPABILITIES_REL:
+            try:
+                registry = json.loads(content)
+                if "capabilities" not in registry:
+                    problems.append(f"{rel} 缺少 capabilities 段")
+            except json.JSONDecodeError as exc:
+                problems.append(f"{rel} 不是合法 JSON：{exc}")
     return problems
 
 
 def asset_rel(rel: str) -> str:
     return f"assets/{rel}.txt" if rel.endswith(".md") else f"assets/{rel}"
+
+
+def render_capabilities() -> str:
+    """由能力注册表生成能力矩阵页；快照尚无该文件时给占位页，保证 strict 不断链。"""
+    src = UPSTREAM / CAPABILITIES_REL
+    if not src.is_file():
+        return HEADER + "# 能力矩阵\n\n等待主仓快照包含 `contract/capabilities.json`。\n"
+
+    registry = json.loads(src.read_text(encoding="utf-8"))
+    lines = [
+        HEADER,
+        "# 能力矩阵",
+        "",
+        "> 真源：主仓 `contract/capabilities.json`。能力服务的路由、MCP tools、Skill 命令与",
+        "> 降级文案均由它派生；本页是生成物，勿手改。",
+        "",
+        "## 能力 × 路由 × 入口",
+        "",
+        "| 能力 | HTTP | MCP tool | Skill 命令 | 网关 | scope |",
+        "|---|---|---|---|---|---|",
+    ]
+    for item in registry["capabilities"]:
+        gateway = "**需要 `EDS_*`**" if item["requiresGateway"] else "不需要"
+        scope = f"`{item['scope']}`" if item["scope"] else "免鉴权"
+        lines.append(
+            f"| `{item['id']}` | `{item['method']} {item['pathTemplate']}` "
+            f"| `{item['mcpTool']}` | `{item['skillCommand']}` | {gateway} | {scope} |"
+        )
+
+    lines += ["", "## 降级口径（各入口共用）", "", "| key | 文案 |", "|---|---|"]
+    for key, text in registry["degradeReasons"].items():
+        lines.append(f"| `{key}` | {text} |")
+
+    lines += ["", "## 错误处置策略", "", "| 现象 | 分类 | 重试 | 建议 |", "|---|---|---|---|"]
+    for row in registry["policyRows"]:
+        lines.append(f"| `{row['label']}` | {row['category']} | {row['retryable']} | {row['hint']} |")
+
+    lines += [
+        "",
+        f"> 业务错误码不在此复制，真源是 `{registry['errorCodeSource']}`；一律以响应里的 `retryable` 为准。",
+        "",
+        '!!! warning "在线查询未与真实网关联调"',
+        f"    {registry['gatewayNote']}",
+        "",
+    ]
+    return "\n".join(lines)
 
 
 def render(manifest: dict) -> None:
@@ -98,6 +152,7 @@ def render(manifest: dict) -> None:
         + "| 目录速查 | [PRODUCTS.md](../assets/catalog/PRODUCTS.md.txt) | 生成物，勿手改 |\n"
         + "| 传输契约 | [transport.md](../assets/docs/api/transport.md.txt) | 已按示例代码接入，4 项未确认、未与真实网关联调 |\n"
         + "| 解析踩坑 | [catalog.md](../assets/docs/catalog.md.txt) | 真源链、易误判事实、升版流程 |\n"
+        + "| 能力矩阵 | [capabilities.md](capabilities.md) | [生成] 由 `contract/capabilities.json` 派生 |\n"
         + "| 能力级契约 | [service.yaml](../assets/openapi/service.yaml) | 对外 6 条路径，含 `degrade_reason` |\n"
         + "| 跨语言行为 | `contract/vectors.json` | 报文 / 错误码 / 信封的黄金向量（不进公开快照，见主仓） |\n\n"
         + "!!! warning \"响应信封仍未确认\"\n"
@@ -105,6 +160,10 @@ def render(manifest: dict) -> None:
         + "    SDK 用候选路径试探，联调后需按主仓 `docs/api/transport.md` 收敛。\n",
         encoding="utf-8",
     )
+
+    capabilities_md = render_capabilities()
+    (DOCS / "contract" / "capabilities.md").write_text(capabilities_md, encoding="utf-8")
+    full.extend(["## contract/capabilities.json（派生能力矩阵）", "", capabilities_md, ""])
 
     changelog = UPSTREAM / "CHANGELOG.md"
     (DOCS / "changelog.md").write_text(
@@ -117,12 +176,14 @@ def render(manifest: dict) -> None:
         "> 第三方 SDK 文档：离线目录可用；在线查询未与真实网关联调，不伪造数据。\n\n"
         "## 入门\n- [首页](index.md)\n- [安装与离线 CLI](getting-started/install.md)\n"
         "## 指南\n- [Python SDK](guides/python.md)\n- [多语言 SDK](guides/sdks.md)\n"
-        "## 契约\n- [契约概览](contract/index.md)\n- [原始文档镜像](reference/index.md)\n"
+        "- [能力服务部署](guides/service.md)\n- [MCP 与 Agent Skill](guides/ai-integration.md)\n"
+        "## 契约\n- [契约概览](contract/index.md)\n- [能力矩阵](contract/capabilities.md)\n"
+        "- [原始文档镜像](reference/index.md)\n"
         "## 其他\n- [变更记录](changelog.md)\n- [全文聚合](llms-full.txt)\n",
         encoding="utf-8",
     )
     (DOCS / "llms-full.txt").write_text("\n".join(full) + "\n", encoding="utf-8")
-    print(f"generated {len(rows)} reference assets, contract/index, changelog, llms*.txt")
+    print(f"generated {len(rows)} reference assets, contract pages, changelog, llms*.txt")
 
 
 def main() -> int:

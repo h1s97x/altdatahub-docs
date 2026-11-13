@@ -1,0 +1,50 @@
+# GitHub Pages 部署。
+# 本文件必须放在 **CNB 文档仓（权威源）**：sync-docs-to-github 是 force 推送，
+# 只写在 GitHub 侧会被同步覆盖。同步到 GitHub 后由该仓的 Actions 构建发布。
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install MkDocs
+        run: python -m pip install -q -r requirements.txt
+      - name: Verify snapshot
+        run: python scripts/build_docs.py --check
+      - name: Render generated pages
+        run: python scripts/build_docs.py
+      - name: Build site
+        run: mkdocs build --strict
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,5 +1,6 @@
 site_name: altdatahub 文档
 site_description: 金融信用信息基础数据库替代数据通 第三方 SDK 与能力服务文档
+site_url: https://h1s97x.github.io/altdatahub-docs/
 strict: true
 
 theme:
@@ -42,7 +43,10 @@ nav:
   - 使用指南:
       - Python SDK: guides/python.md
       - 多语言 SDK: guides/sdks.md
+      - 能力服务部署: guides/service.md
+      - MCP 与 Agent Skill: guides/ai-integration.md
   - 契约:
       - 数据 / 传输 / 错误码: contract/index.md
+      - 能力矩阵: contract/capabilities.md
       - 原始文档镜像: reference/index.md
   - 变更记录: changelog.md

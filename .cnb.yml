@@ -28,6 +28,14 @@ main:
           script: set -e; python scripts/build_docs.py
         - name: mkdocs build
           script: set -e; mkdocs build --strict; tar -czf site.tar.gz -C site .; ls -lh site.tar.gz
+        - name: verify site artifact
+          script: |
+            set -e
+            for f in index.html llms.txt llms-full.txt sitemap.xml search/search_index.json contract/capabilities/index.html; do
+              test -s "site/$f" || { echo "产物缺失或为空: site/$f"; exit 1; }
+            done
+            tar -tzf site.tar.gz | grep -q '^\./index.html$'
+            echo "site artifact ok: $(tar -tzf site.tar.gz | wc -l) entries"
 
     - name: sync-docs-to-github
       imports:
