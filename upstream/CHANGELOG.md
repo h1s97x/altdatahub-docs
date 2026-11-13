@@ -94,6 +94,17 @@
   `scripts/ensure_pages.py` 幂等保证 Pages 配置，文档仓 CI 增加 `site/` 产物完整性核对。
 - 新增 `guides/service.md`、`guides/ai-integration.md`，`mkdocs.yml` 设置 `site_url`。
 - 站点：<https://h1s97x.github.io/altdatahub-docs/>
+
+**文档站增强（第一批）**
+
+- 中文搜索：发现 `theme.language: zh` 会隐式启用 `lang: [zh]`，而 Material 打包的
+  `lunr.zh.min.js` 在浏览器端缺 `@node-rs/jieba`、会抛 `e.cut` 错误；改为显式 `lang: [en]`
+  + CJK 标点断句，启用 `search.suggest` / `search.highlight` / `search.share` 与关键页 `search.boost`。
+- `llms-full.txt` 重写：纳入 6 个手写页、快照原文与派生页，加编号目录（26 章节 / 120 KB），
+  修正此前**手写页完全不在 AI 全文里**的问题；新增 `scripts/check_site.py` 校验链接、目录、
+  体积、脱敏与中文索引，并接入文档仓 CI 与 GitHub Pages workflow。
+- 新增 `guides/troubleshooting.md`（排障 FAQ）与 `guides/contract-governance.md`（契约治理与分册升版）。
+- `mike` 暂不启用（单版本 + 与 Actions Pages 部署模式冲突），启用条件写入文档仓 README。
 - 砍掉 `parity-results.json` 运行时汇总：静态 PARITY 标记 + 各语言全量参数化 + CI
   已能发现漏接，跨并行 job 传递产物收益不抵复杂度，避免又多一份需同步的生成物。
 
