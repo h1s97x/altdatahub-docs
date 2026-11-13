@@ -1,6 +1,7 @@
-# 文档仓：CNB 是权威源。main.push 做两件事：
-#   1) 构建 MkDocs 站点（只出 site/ 与 site.tar.gz 产物，当前不部署）
-#   2) 同步到 GitHub 文档仓 h1s97x/altdatahub-docs（未来 GitHub Pages 源）
+# 文档仓：CNB 是权威源。main.push 做三件事：
+#   1) 构建 MkDocs 站点（出 site/ 与 site.tar.gz 产物并核对）
+#   2) 同步到 GitHub 文档仓 h1s97x/altdatahub-docs，由那边的 Actions 发布 GitHub Pages
+#   3) 幂等确保 GitHub Pages 已启用（build_type=workflow），首次启用后补触发一次部署
 # 主仓 ci-contracts 推送 upstream/ 快照时会自动触发本流水线（同步方式 A）。
 #
 # GitHub 侧是纯镜像：不得存在 CNB 没有的文件。将来的 .github/workflows/pages.yml
@@ -48,3 +49,12 @@ main:
             push_tags: true
             sync_mode: push
             force: true
+
+    - name: ensure-github-pages
+      docker:
+        image: python:3.12
+      imports:
+        - https://cnb.cool/h1s97x/secret-env/-/blob/main/env.yml
+      stages:
+        - name: enable pages if needed
+          script: set -e; python scripts/ensure_pages.py
