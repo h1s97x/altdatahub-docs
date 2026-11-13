@@ -4,6 +4,37 @@
 **0.1.0 已发布到 CNB PyPI 制品库 `h1s97x/pypi`**（未发布到 PyPI 官方），
 更早的历史变更以提交记录为准。
 
+## [Unreleased]
+
+### 新增
+
+- `service/console_cli.py`：纯标准库交互式联调 CLI，问答填 4 个必填业务参数，支持
+  **网关探针**（直连 EDS 网关、原始响应落盘 0600、打印信封结构摘要）与**能力服务**两种模式；
+  不依赖 `src/altdatahub`，宿主机只需这一个文件 + 本地 `.env`。10 项不联网回归用例。
+- `.gitignore`：忽略 `service/probe/` 与根 `/probe/`，防止含真实响应的探针产物误提交。
+
+### 变更
+
+- P0 编排：`service/compose.yml` / `service/compose.arm64.yml` 的 `SERVICE_AUTH_TOKEN` 改为
+  `${...:?}` 必填（容器内监听 `0.0.0.0`，空 Token 会让服务按设计退出码 2 并反复重启）；
+  `.env.example` 与 `service/README.md` 同步澄清该约束。
+- `service/README.md`：补 v1 `docker-compose`（连字符）兼容写法、门户 4 必填 + 2 选填业务参数表、
+  `--env-file` 位置说明、纯 `docker run` 兜底，以及联调 CLI 用法。
+- `service/probe.py` 与 `service/compose.arm64.yml`：探针示例参数从 `{}` / 单个 `entName`
+  补齐为 `entName` / `idNum` / `idType` / `queryReason` 必填集（按示例代码推断，待截图核对字段名）。
+
+### 已确认的联调证据（2026-11-13，内网 aarch64 机器）
+
+- 真实错误响应：顶层 `code` / `msg` / `data`，业务错误走 HTTP 200；`code:"3000"`（无权限）
+  被 `check_error` 正确判为 `EdsBizError` / authentication / 不重试，与错误码表和契约向量一致。
+  请求侧 8 个 `eds_*` 公共参数 + 业务参数同层平铺、`eds_validday` 数字 0 被网关接受。
+- 门户「服务验证」成功响应截图：`code:"0000"`（成功码，不在四个错误码内）、`msg`、
+  `data` 为数组且产品数据行在内层 `data[].data`；当前 `DATA_PATHS` 五个候选均取不到，
+  会把外层对象当数据行、业务字段静默降级为 `None`。**这是待修的行为缺陷，尚未改代码。**
+- 上述结论只记录结构，不含凭据、账号、企业名与证件号；原始探针产物与 `.env` 留在内网机器，
+  已被 `.gitignore` 忽略、不入库，也不出网。后续联调只依据截图人工转写结构，
+  不要求回传原始报文。
+
 ## [0.1.0] - 2026-11-13
 
 ### 新增

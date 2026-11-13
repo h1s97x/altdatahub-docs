@@ -23,8 +23,8 @@
 PYTHONPATH=src python -m service
 curl http://127.0.0.1:8802/v1/ping
 
-# 2) 容器（只绑回环）
-cp .env.example .env        # 填 EDS_*（可选）+ SERVICE_AUTH_TOKEN
+# 2) 容器（只绑宿主机回环；容器内监听 0.0.0.0，SERVICE_AUTH_TOKEN 必填非空）
+cp .env.example .env        # 填非空的 SERVICE_AUTH_TOKEN，EDS_* 可选
 docker compose -f service/compose.yml --env-file .env up -d --build
 
 # 3) 生产：签发 Token → 不发布端口、只加入调用方网络
@@ -32,6 +32,31 @@ python service/issue_token.py --caller backend --scopes '*' --quiet
 DUEAGENT_NETWORK=workspace_default \
   docker compose -f service/compose.internal.yml --env-file .env up -d --build
 ```
+
+容器内 `SERVICE_HOST=0.0.0.0`，空 Token 会让服务按设计拒绝启动；`Container Started` 不等于端口已监听。
+先确认 `docker logs altdatahub-service` 出现「能力服务已启动」，再 curl `/v1/ping`（不鉴权）。
+
+## 联调 CLI（交互式）
+
+`service/console_cli.py` 是纯标准库单文件工具：**不需要浏览器、不新增端口、不改服务端、不重建镜像**。
+宿主机有 python3，把这一个文件和 `.env` 放到同一台机器上即可：
+
+```bash
+python3 service/console_cli.py                       # 交互式，默认读 ./.env
+python3 service/console_cli.py --env-file .env --mode probe
+```
+
+两种模式：
+
+- **网关探针（默认，替代手写 probe 脚本）**：逐项问答填 4 个必填业务参数（+ 2 个选填），
+  从 `.env` 读 7 个 `EDS_*`，连同按 `izxzx<productCode>` 拼出的服务号组成 8 个公共参数，
+  直接 POST 网关，把**原始响应**落盘到 `./probe/probe-<label>-<UTC>.json`（权限 0600），
+  并打印信封层级摘要。
+- **能力服务**：带 `SERVICE_AUTH_TOKEN` 调 `POST /v1/query/{code}`，看结构化结果与耗时。
+
+支持「改一个参数重发」「打印完整响应」「打印可复制的 `--params`」，缺必填项会当场提示。
+CLI 不回显 `EDS_*` 与 Token，落盘的请求体里 `eds_account` 脱敏、URL 主机脱敏为 `<EDS_HOST>`；
+凭据只读本地 `.env`，不进仓库。它不改变 `src/altdatahub/cli.py` 只做离线元数据的边界。
 
 ## aarch64 联调镜像（P0）
 
@@ -42,7 +67,7 @@ CNB 在原生 `cnb:arch:arm64:v8` 节点上构建 `linux/arm64` 镜像并推送�
 docker pull docker.cnb.cool/h1s97x/whccb/altdatahub/altdatahub-service:0.1.0-arm64
 ```
 
-在 aarch64 机器上准备 `.env`（7 个 `EDS_*` 必填），然后：
+在 aarch64 机器上准备 `.env`（7 个 `EDS_*` 与非空 `SERVICE_AUTH_TOKEN` 必填，缺任意一个 compose 会直接报错），然后：
 
 ```bash
 docker compose -f service/compose.arm64.yml --env-file .env up -d
@@ -50,14 +75,60 @@ curl http://127.0.0.1:8802/v1/ping
 
 # 采集一份真实成功响应
 docker compose -f service/compose.arm64.yml --env-file .env --profile probe \
-  run --rm probe --product-code S0101 --params '{"entName":"示例企业"}' --label success
+  run --rm probe --product-code S0101 --params '{"entName":"<企业名称>","idNum":"<身份标识号码>","idType":"01","queryReason":"01"}' --label success
 
 # 采集一份错误响应（换无效 productCode / 服务号）
 docker compose -f service/compose.arm64.yml --env-file .env --profile probe \
   run --rm probe --product-code XXXX --params '{}' --label error
 ```
 
-探针把**原始响应体**写到 `./probe/probe-<label>-<UTC>.json`（权限 0600），同时记录
+`--params` 要给全门户「服务验证」表单的必填业务参数，只传 `entName` 会被判参数不全。
+按《接口规范》示例代码，S0101 常用键如下（`page` / `pageSize` 选填，可留空）：
+
+| 门户表单 | 参数名 | 必填 |
+|---|---|---|
+| 企业名称 | `entName` | 是 |
+| 企业身份标识号码 | `idNum` | 是 |
+| 企业身份标识类型 | `idType` | 是 |
+| 查询原因 | `queryReason` | 是 |
+| 页数 / 每页大小 | `page` / `pageSize` | 否 |
+
+字段名按《接口规范》示例代码推断，请对照门户测试表单截图核对；分册字段字典里的
+`entCertNo` / `entCertType` 出现在响应字段中，请求侧示例代码用的是 `idNum` / `idType`。
+内网数据不出网，不需要回传原始请求报文。
+公开文档只放占位符，真实测试企业与证件号码只写进本地命令。
+
+`--env-file` 是 **compose 顶层** flag，必须放在 `run` 之前，它给 compose 做变量插值，
+不是探针 `python -m service.probe` 的参数（后者只认 `--product-code` / `--params` /
+`--label` / `--out`）。
+
+先用 `docker compose version` / `docker-compose version` 确认客户端：内网老机器若只有 v1
+独立命令，全部示例改用 `docker-compose`（连字符）；`docker compose`（空格）会落回 docker
+顶层 CLI，`-f` / `--env-file` 都可能报 `unknown flag`。v1 < 1.28 不支持 `--env-file` 时
+省略即可（它默认读**工作目录**的 `.env`，所以要从仓库根执行）；不支持 `--profile` 时
+`run --rm probe` 直接指定服务名即可：
+
+```bash
+docker-compose -f service/compose.arm64.yml up -d
+docker-compose -f service/compose.arm64.yml run --rm probe \
+  --product-code S0101 --params '{"entName":"<企业名称>","idNum":"<身份标识号码>","idType":"01","queryReason":"01"}' --label success
+```
+
+若 `docker-compose` 仍有 flag 或 schema 限制，绕开 compose 用 `docker run`（`--env-file` 是
+docker 顶层原生 flag，老版本也支持）：
+
+```bash
+mkdir -p service/probe
+grep -vE '^[[:space:]]*(#|$)' .env > /tmp/ah-probe.env
+IMG=docker.cnb.cool/h1s97x/whccb/altdatahub/altdatahub-service:0.1.0-arm64
+docker run --rm --env-file /tmp/ah-probe.env \
+  -v "$(pwd)/service/probe:/app/probe" \
+  --entrypoint python "$IMG" -m service.probe \
+  --product-code S0101 --params '{"entName":"<企业名称>","idNum":"<身份标识号码>","idType":"01","queryReason":"01"}' --label success
+```
+
+探针把**原始响应体**写到 `service/probe/probe-<label>-<UTC>.json`（权限 0600）：compose 卷
+`./probe` 相对 compose 文件所在的 `service/` 目录，不是仓库根，也不是可执行脚本。同时记录
 请求 URL（主机脱敏为 `<EDS_HOST>`）、请求体（`eds_account` 脱敏）、HTTP 状态与响应原文，
 以及 SDK 当前用 `check_error` / `extract_rows` 得到的解释结果；stdout 只报路径与字节数。
 

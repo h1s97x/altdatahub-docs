@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@dfcdd70",
+  "source": "altdatahub@7c380b1",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -22,8 +22,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "dfc70bf3a84abfc36b2dfe2285a0429676ddfc449b95179206e799fb56e8b3bb",
-      "bytes": 9241
+      "sha256": "14a9688e632afd4d7360fe5ee891cc24430d369cb50b75c9c9a6fa921383146d",
+      "bytes": 11482
     },
     {
       "path": "LICENSE",
@@ -57,8 +57,8 @@
     },
     {
       "path": "service/README.md",
-      "sha256": "c6c524d5504d752ef887ce929c90c6514cf1ab2df162e7687d76ca8322adf62b",
-      "bytes": 6561
+      "sha256": "a685514d8c783df5cb33cd1eede6335a55048b6c0f4a3b34535b0e92019a5206",
+      "bytes": 10860
     },
     {
       "path": "mcp/README.md",
