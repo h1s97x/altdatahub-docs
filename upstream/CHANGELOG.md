@@ -85,6 +85,15 @@
 - **A 方案已验证**：内置 `CNB_TOKEN` 能推送到 Private 文档仓；主仓 `main.push` 产生
   `docs: sync snapshot <sha>` 提交（作者 `h1s97x <yang1297656998@outlook.com>`），
   文档仓 CI 自动跑通 `mkdocs build --strict`。
+
+**文档站上线（M5）**
+
+- 能力矩阵页：主仓快照纳入 `contract/capabilities.json`，文档仓 `scripts/build_docs.py`
+  生成 `contract/capabilities.md`（能力 × 路由 × MCP tool × Skill 命令 × 降级口径）。
+- `.github/workflows/pages.yml` 放在 **CNB 文档仓（权威源）**，由 GitHub Actions 构建发布；
+  `scripts/ensure_pages.py` 幂等保证 Pages 配置，文档仓 CI 增加 `site/` 产物完整性核对。
+- 新增 `guides/service.md`、`guides/ai-integration.md`，`mkdocs.yml` 设置 `site_url`。
+- 站点：<https://h1s97x.github.io/altdatahub-docs/>
 - 砍掉 `parity-results.json` 运行时汇总：静态 PARITY 标记 + 各语言全量参数化 + CI
   已能发现漏接，跨并行 job 传递产物收益不抵复杂度，避免又多一份需同步的生成物。
 
