@@ -6,13 +6,15 @@
 
 ## 能力 × 入参
 
+<!-- BEGIN GENERATED: capabilities -->
 | 能力 | 端点 | 必填 | 可选 | 网关 |
 |---|---|---|---|---|
 | `categories` | `GET /v1/categories` | — | — | 不需要 |
-| `catalog` | `GET /v1/catalog` | — | `category`（大类 key） | 不需要 |
-| `schema` | `GET /v1/schema/{code}` | `product_code` | — | 不需要 |
-| `query` | `POST /v1/query/{code}` | `product_code` | 平铺业务参数 | **需要 `EDS_*`** |
+| `catalog` | `GET /v1/catalog` | — | `category` | 不需要 |
+| `schema` | `GET /v1/schema/{productCode}` | `product_code` | — | 不需要 |
+| `query` | `POST /v1/query/{productCode}` | `product_code` | 平铺业务参数 | **需要 `EDS_*`** |
 | `ping` | `GET /v1/ping` | — | — | 不需要 |
+<!-- END GENERATED: capabilities -->
 
 `query` 的 body 是**业务参数平铺**（如 `{"entName":"贵州茅台","page":"1"}`），
 8 个 `eds_*` 公共参数由服务端注入，业务参数含 `eds_` 前缀会被直接拒绝。
@@ -60,18 +62,20 @@
 
 ## 错误码速查
 
+<!-- BEGIN GENERATED: error_codes -->
 | 码 / 现象 | 分类 | 重试 | 建议 |
 |---|---|---|---|
-| `1000` | validation | 否 | 核对服务号与业务参数名 |
-| `2000` | validation | **否**（可能重复计费） | 加 `page` / `pageSize` |
-| `3000` | authentication | 否 | 核对 `eds_account` 授权与服务号是否开通 |
-| `9999` | upstream | 是 | 有界退避重试 |
-| `category=configuration` | 配置 | 否 | 服务端补 `EDS_*` |
+| `1000` | validation | 否 | 请求参数无效：核对 eds_transcode（服务号）与业务参数名；该错误重试无用。 |
+| `2000` | validation | 否 | 数据量返回超出阈值：请使用分页参数（page / pageSize）再查，不要重试同一请求（大概率重复计费）。 |
+| `3000` | authentication | 否 | 该账户无此接口权限：核对 eds_account 授权串与 eds_transcode 的服务号是否已开通。 |
+| `9999` | upstream | 是 | 上游系统错误：有界退避重试（建议 3 次、2^n×500ms），仍失败再报。 |
+| `category=configuration` | 配置 | 否 | 服务端补 EDS_* |
 | `category=contract` | 契约 | 否 | 响应信封未联调，报告待确认 |
-| `category=upstream` | 上游 | 看 `retryable` | 按指示退避 |
-| HTTP 401 | 鉴权 | 否 | 调用方 Token 无效/被吊销，重新签发 |
-| HTTP 403 | 鉴权 / ACL | 否 | scope 不足或来源 IP 不在白名单 |
-| HTTP 429 | 限流 | 是 | 稍后重试 |
+| `category=upstream` | 上游 | 看 retryable | 按指示退避 |
+| `HTTP 401` | 鉴权 | 否 | 调用方 Token 无效/被吊销，重新签发 |
+| `HTTP 403` | 鉴权 / ACL | 否 | scope 不足或来源 IP 不在白名单 |
+| `HTTP 429` | 限流 | 是 | 稍后重试 |
+<!-- END GENERATED: error_codes -->
 
 **一律以响应里的 `retryable` 为准。**
 

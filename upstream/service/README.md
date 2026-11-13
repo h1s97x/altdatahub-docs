@@ -33,6 +33,39 @@ DUEAGENT_NETWORK=workspace_default \
   docker compose -f service/compose.internal.yml --env-file .env up -d --build
 ```
 
+## aarch64 联调镜像（P0）
+
+CNB 在原生 `cnb:arch:arm64:v8` 节点上构建 `linux/arm64` 镜像并推送到 Docker 制品库，
+**镜像内不含任何凭据**：
+
+```bash
+docker pull docker.cnb.cool/h1s97x/whccb/altdatahub/altdatahub-service:0.1.0-arm64
+```
+
+在 aarch64 机器上准备 `.env`（7 个 `EDS_*` 必填），然后：
+
+```bash
+docker compose -f service/compose.arm64.yml --env-file .env up -d
+curl http://127.0.0.1:8802/v1/ping
+
+# 采集一份真实成功响应
+docker compose -f service/compose.arm64.yml --env-file .env --profile probe \
+  run --rm probe --product-code S0101 --params '{"entName":"示例企业"}' --label success
+
+# 采集一份错误响应（换无效 productCode / 服务号）
+docker compose -f service/compose.arm64.yml --env-file .env --profile probe \
+  run --rm probe --product-code XXXX --params '{}' --label error
+```
+
+探针把**原始响应体**写到 `./probe/probe-<label>-<UTC>.json`（权限 0600），同时记录
+请求 URL（主机脱敏为 `<EDS_HOST>`）、请求体（`eds_account` 脱敏）、HTTP 状态与响应原文，
+以及 SDK 当前用 `check_error` / `extract_rows` 得到的解释结果；stdout 只报路径与字节数。
+
+回传样例前请**自行脱敏响应里的业务数据，但保留信封层级与字段名** —— 要靠它钉死
+4 项：数据行位置、错误码字段名、51 个服务号、`eds_validday` 类型；另有 2 项
+（是否共用 URL、`page/pageSize` 是否要求数字）可用同一探针换参数验证。
+本地若只需自建镜像：`docker buildx build --platform linux/arm64 -f service/Dockerfile -t altdatahub-service:arm64 .`。
+
 ## 对外契约（能力级，不是 51 个 `/products/{code}`）
 
 机器版见 `openapi/service.yaml`。

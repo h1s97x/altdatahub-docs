@@ -26,7 +26,14 @@
 
 ## 安装
 
-本包尚未发布到 PyPI（`pip install altdatahub` 目前不可用），从仓库源码安装：
+本包发布在 **CNB PyPI 制品库 `h1s97x/pypi`**（不是 PyPI 官方源）：
+
+```bash
+pip install --index-url https://pypi.cnb.cool/h1s97x/pypi/-/packages/simple altdatahub
+```
+
+若制品库设为私有，按平台的「拉取制品」指引配置凭据后再安装。
+从仓库源码安装（开发 / 离线）：
 
 ```bash
 pip install .                    # 核心零第三方依赖（stdlib only）
