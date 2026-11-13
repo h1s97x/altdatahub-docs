@@ -5,6 +5,8 @@ __pycache__/
 *.py[cod]
 
 # build_docs.py 生成物（CI 每次从 upstream/ 重建，不入库）
+docs/api/endpoints.md
+docs/mcp/tools.md
 docs/contract/
 docs/reference/
 docs/changelog.md

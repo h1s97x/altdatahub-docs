@@ -50,17 +50,22 @@ plugins:
 
 nav:
   - 首页: index.md
-  - 快速开始:
-      - 安装与离线 CLI: getting-started/install.md
-  - 使用指南:
+  - API 文档:
+      - 总览与鉴权: api/index.md
+      - 端点参考: api/endpoints.md
+      - 数据契约: contract/index.md
+      - 能力矩阵: contract/capabilities.md
+      - 原始文档镜像: reference/index.md
+  - MCP 文档:
+      - 总览: mcp/index.md
+      - Tools 参考: mcp/tools.md
+      - 部署与配置: mcp/deploy.md
+  - 开发工具:
+      - 安装与 CLI: getting-started/install.md
       - Python SDK: guides/python.md
       - 多语言 SDK: guides/sdks.md
       - 能力服务部署: guides/service.md
-      - MCP 与 Agent Skill: guides/ai-integration.md
-      - 排障 FAQ: guides/troubleshooting.md
-  - 契约:
-      - 数据 / 传输 / 错误码: contract/index.md
-      - 能力矩阵: contract/capabilities.md
+      - 工具链与生成器: guides/toolchain.md
       - 契约治理与分册升版: guides/contract-governance.md
-      - 原始文档镜像: reference/index.md
+      - 排障 FAQ: guides/troubleshooting.md
   - 变更记录: changelog.md

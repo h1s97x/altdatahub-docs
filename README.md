@@ -26,6 +26,23 @@ mkdocs build --strict        # 产物在 site/
 没有 `upstream/manifest.json` 时，`build_docs.py --check` 会失败；
 本地调试可先在主仓跑 `python tools/verify.py export`，把 `contract/snapshot/` 复制到 `upstream/`。
 
+## 栏目结构
+
+导航按三类组织，与同类数据服务文档站对齐：
+
+| 栏目 | 内容 | 页面来源 |
+|---|---|---|
+| **API 文档** | 总览与鉴权、逐端点参数/curl 示例、数据契约、能力矩阵、原始文档镜像 | `docs/api/index.md` 手写；`api/endpoints.md`、`contract/`、`reference/` 由 `build_docs.py` 生成 |
+| **MCP 文档** | 总览、5 个 tool 的 `inputSchema` 与 JSON-RPC 示例、部署与配置 | `docs/mcp/index.md` / `deploy.md` 手写；`mcp/tools.md` 生成 |
+| **开发工具** | 安装与 CLI、Python/多语言 SDK、能力服务部署、工具链与生成器、分册升版、排障 FAQ | 全部手写 |
+
+生成页的真源是 `upstream/contract/capabilities.json` 与脱敏快照；手写页与生成页同目录时，
+`build_docs.py` 只删指定生成文件，不会误删手写页。`scripts/check_site.py` 校验三大板块关键页。
+
+**与商业数据文档站的差别（刻意保留）**：本站不提供在线调试台、试用 Token 或可公开调用的
+接口 —— 在线链路尚未与真实 EDS 网关联调，做假调试界面等于编造数据。所有在线示例都明确
+标注「未联调 / 缺凭据显式降级」。
+
 ## 搜索与版本化
 
 - **搜索**：显式声明 `plugins.search.lang: [en]`，`separator` 把全角空白与 CJK 标点作为断句边界；

@@ -4,8 +4,9 @@
     python scripts/build_docs.py            # 生成
     python scripts/build_docs.py --check    # 只校验 manifest / sha256 / 脱敏
 
-`upstream/` 是主仓 CI 推来的唯一真源；`docs/contract/`、`docs/reference/`、
-`docs/changelog.md`、`docs/llms*.txt`、`docs/assets/` 全部由本脚本生成，勿手改、不入库。
+`upstream/` 是主仓 CI 推来的唯一真源；`docs/api/endpoints.md`、`docs/mcp/tools.md`、
+`docs/contract/`、`docs/reference/`、`docs/changelog.md`、`docs/llms*.txt`、`docs/assets/`
+全部由本脚本生成，勿手改、不入库。
 """
 
 from __future__ import annotations
@@ -22,9 +23,19 @@ ROOT = Path(__file__).resolve().parent.parent
 UPSTREAM = ROOT / "upstream"
 DOCS = ROOT / "docs"
 ASSETS = DOCS / "assets"
+# 整目录都是生成物，可安全重建
 GENERATED_DIRS = (DOCS / "contract", DOCS / "reference", ASSETS)
-GENERATED_FILES = (DOCS / "changelog.md", DOCS / "llms.txt", DOCS / "llms-full.txt")
+# api/ 与 mcp/ 含手写总览页，只补目录、不整目录删除
+GENERATED_DIRS_KEEP = (DOCS / "api", DOCS / "mcp")
+GENERATED_FILES = (
+    DOCS / "changelog.md",
+    DOCS / "llms.txt",
+    DOCS / "llms-full.txt",
+    DOCS / "api" / "endpoints.md",
+    DOCS / "mcp" / "tools.md",
+)
 GENERATED_TOP_DIRS = {"contract", "reference", "assets"}
+GENERATED_FILE_SET = {path.resolve() for path in GENERATED_FILES if path.suffix == ".md"}
 HEADER = "<!-- 由 scripts/build_docs.py 从 upstream/ 生成，勿手改 -->\n\n"
 CAPABILITIES_REL = "contract/capabilities.json"
 # 主仓快照已脱敏；这里是第二道防线，防止脱敏规则失效后把内网地址发布出去。
@@ -34,6 +45,11 @@ SENSITIVE = re.compile(r"\b80\.37\.0\.103\b|https?://(?!127\.0\.0\.1|0\.0\.0\.0)
 def load_manifest() -> dict | None:
     path = UPSTREAM / "manifest.json"
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+
+def load_registry() -> dict:
+    path = UPSTREAM / CAPABILITIES_REL
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"capabilities": []}
 
 
 def verify(manifest: dict) -> list[str]:
@@ -70,17 +86,15 @@ def handwritten_pages() -> list[Path]:
         path
         for path in DOCS.rglob("*.md")
         if path.relative_to(DOCS).parts[0] not in GENERATED_TOP_DIRS
-        and path.name != "changelog.md"
+        and path.resolve() not in GENERATED_FILE_SET
     )
 
 
-def render_capabilities() -> str:
+def render_capabilities(registry: dict) -> str:
     """由能力注册表生成能力矩阵页；快照尚无该文件时给占位页，保证 strict 不断链。"""
-    src = UPSTREAM / CAPABILITIES_REL
-    if not src.is_file():
+    if not registry["capabilities"]:
         return HEADER + "# 能力矩阵\n\n等待主仓快照包含 `contract/capabilities.json`。\n"
 
-    registry = json.loads(src.read_text(encoding="utf-8"))
     lines = [
         HEADER,
         "# 能力矩阵",
@@ -102,11 +116,11 @@ def render_capabilities() -> str:
         )
 
     lines += ["", "## 降级口径（各入口共用）", "", "| key | 文案 |", "|---|---|"]
-    for key, text in registry["degradeReasons"].items():
+    for key, text in registry.get("degradeReasons", {}).items():
         lines.append(f"| `{key}` | {text} |")
 
     lines += ["", "## 错误处置策略", "", "| 现象 | 分类 | 重试 | 建议 |", "|---|---|---|---|"]
-    for row in registry["policyRows"]:
+    for row in registry.get("policyRows", []):
         lines.append(f"| `{row['label']}` | {row['category']} | {row['retryable']} | {row['hint']} |")
 
     lines += [
@@ -120,11 +134,193 @@ def render_capabilities() -> str:
     return "\n".join(lines)
 
 
+def curl_example(item: dict) -> str:
+    base = "http://127.0.0.1:8802"
+    auth = '-H "Authorization: Bearer $TOKEN" '
+    routes = {
+        "ping": f"curl {base}/v1/ping",
+        "categories": f"curl {auth}{base}/v1/categories",
+        "catalog": f'curl {auth}"{base}/v1/catalog?category=judicial"',
+        "schema": f"curl {auth}{base}/v1/schema/S0101",
+        "query": (
+            f"curl -X POST {auth}-H 'Content-Type: application/json' \\\n"
+            f"  -d '{{\"entName\":\"示例企业\"}}' {base}/v1/query/S0101"
+        ),
+    }
+    return routes.get(item["id"], f"curl {auth}{base}{item['path']}")
+
+
+def render_api_endpoints(registry: dict) -> str:
+    """API 文档 · 端点参考：由能力注册表生成，保证与运行时路由同源。"""
+    caps = registry["capabilities"]
+    if not caps:
+        return HEADER + "# 端点参考\n\n等待主仓快照包含 `contract/capabilities.json`。\n"
+
+    lines = [
+        HEADER,
+        "# 端点参考",
+        "",
+        "> 本页由 `contract/capabilities.json` 生成；路由、鉴权 scope、网关依赖与参数同源。",
+        "> 详见 [API 总览](index.md) 与 [能力矩阵](../contract/capabilities.md)。",
+        "",
+        "## 通用约定",
+        "",
+        "| 项 | 说明 |",
+        "|---|---|",
+        "| Base URL | `http://127.0.0.1:8802`（本机）/ `http://altdatahub-service:8802`（内网 compose） |",
+        "| 鉴权 | `Authorization: Bearer <token>`；`/v1/ping`、`/healthz` 不鉴权 |",
+        "| 响应 | JSON，`success` + `data`；失败时带 `category` / `retryable` / `degrade_reason` |",
+        "| 在线查询 | 需服务端 `EDS_*`；**未与真实网关联调**，失败显式降级、不伪造数据 |",
+        "",
+        "## 端点清单",
+        "",
+        "| 端点 | 能力 | 鉴权 scope | 网关 |",
+        "|---|---|---|---|",
+    ]
+    for item in caps:
+        scope = f"`{item['scope']}`" if item["scope"] else "免鉴权"
+        lines.append(
+            f"| `{item['method']} {item['pathTemplate']}` | `{item['id']}` | {scope} | {item['gatewayLabel']} |"
+        )
+
+    lines += ["", "## 逐端点说明", ""]
+    for item in caps:
+        lines += [f"### `{item['method']} {item['pathTemplate']}`", "", item["summary"] + "。", ""]
+        schema = item["mcpInputSchema"]
+        props = schema.get("properties", {})
+        required = schema.get("required", [])
+        if props:
+            lines += ["| 参数 | 位置 | 必填 | 说明 |", "|---|---|---|---|"]
+            for name, spec in props.items():
+                if name == "product_code":
+                    location = "path"
+                elif item["argKind"] == "category":
+                    location = "query"
+                else:
+                    location = "body"
+                lines.append(
+                    f"| `{name}` | {location} | {'是' if name in required else '否'} | {spec.get('description', '—')} |"
+                )
+            lines.append("")
+        lines += ["```bash", curl_example(item), "```", ""]
+        if item["requiresGateway"]:
+            lines += [
+                '!!! warning "在线能力未联调"',
+                "    该端点依赖 EDS 网关。缺凭据或未联调时返回 `success=false` + `degrade_reason`，",
+                "    这是「数据源未接入」，**不是「查无记录」**；`data: []` 才是正常成功。",
+                "",
+            ]
+
+    lines += ["## 错误处置", "", "| 现象 | 分类 | 重试 | 建议 |", "|---|---|---|---|"]
+    for row in registry.get("policyRows", []):
+        lines.append(f"| `{row['label']}` | {row['category']} | {row['retryable']} | {row['hint']} |")
+    lines += [
+        "",
+        "> 业务错误码（`1000/2000/3000/9999`）见 [数据契约](../contract/index.md)，",
+        "> 一律以响应里的 `retryable` 为准。",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def tool_arguments(item: dict) -> dict:
+    props = item["mcpInputSchema"].get("properties", {})
+    examples = {
+        "product_code": "S0101",
+        "category": "judicial",
+        "params": {"entName": "示例企业"},
+    }
+    return {key: examples[key] for key in props if key in examples}
+
+
+def render_mcp_tools(registry: dict) -> str:
+    """MCP 文档 · Tools 参考：inputSchema 与 tools/list 返回保持一致。"""
+    caps = registry["capabilities"]
+    if not caps:
+        return HEADER + "# MCP Tools 参考\n\n等待主仓快照包含 `contract/capabilities.json`。\n"
+
+    lines = [
+        HEADER,
+        "# MCP Tools 参考",
+        "",
+        "> 本页由 `contract/capabilities.json` 生成；`tools/list` 返回的 `inputSchema` 与本页一致。",
+        "> 启动与配置见 [部署与配置](deploy.md)，概念见 [MCP 总览](index.md)。",
+        "",
+        "## Tools 一览",
+        "",
+        "| Tool | 能力 | 对应 HTTP | 网关 |",
+        "|---|---|---|---|",
+    ]
+    for item in caps:
+        lines.append(
+            f"| `{item['mcpTool']}` | `{item['id']}` | `{item['method']} {item['pathTemplate']}` "
+            f"| {item['gatewayLabel']} |"
+        )
+
+    lines += ["", "## 逐 Tool 说明", ""]
+    for item in caps:
+        lines += [
+            f"### `{item['mcpTool']}`",
+            "",
+            item["mcpDescription"] + "。",
+            "",
+            f"- 对应能力：`{item['id']}` · scope `{item['scope'] or '免鉴权'}`",
+            f"- Skill 命令：`{item['skillCommand']}`",
+            "",
+            "**inputSchema**",
+            "",
+            "```json",
+            json.dumps(item["mcpInputSchema"], ensure_ascii=False, indent=2),
+            "```",
+            "",
+            "**调用示例（JSON-RPC 2.0）**",
+            "",
+            "```json",
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": item["mcpTool"], "arguments": tool_arguments(item)},
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            "```",
+            "",
+        ]
+        if item["requiresGateway"]:
+            lines += [
+                '!!! warning "不得伪造数据"',
+                "    未联调或缺 `EDS_*` 时返回结构化降级；不能把 `success=false` 说成「未查到」，",
+                "    也不能用示例数据冒充真实结果。",
+                "",
+            ]
+
+    lines += [
+        "## 通用返回结构",
+        "",
+        "```json",
+        json.dumps(
+            {"jsonrpc": "2.0", "id": 1, "result": {"content": [{"type": "text", "text": "{\"success\":true,...}"}]}},
+            ensure_ascii=False,
+            indent=2,
+        ),
+        "```",
+        "",
+        "大结果受 `MCP_MAX_CHARS` 裁剪；审计日志不落企业名明文与凭据。",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def render(manifest: dict) -> None:
     for path in GENERATED_DIRS:
         if path.exists():
             shutil.rmtree(path)
         path.mkdir(parents=True)
+    for path in GENERATED_DIRS_KEEP:
+        path.mkdir(parents=True, exist_ok=True)
     for path in GENERATED_FILES:
         if path.exists():
             path.unlink()
@@ -143,6 +339,14 @@ def render(manifest: dict) -> None:
         rows.append(f"| `{rel}` | [原文](../{asset_rel(rel)}) |")
         if rel.endswith(".md"):
             snapshot_sections.append((f"快照原文：{rel}", content))
+
+    registry = load_registry()
+    capabilities_md = render_capabilities(registry)
+    api_md = render_api_endpoints(registry)
+    mcp_md = render_mcp_tools(registry)
+    (DOCS / "contract" / "capabilities.md").write_text(capabilities_md, encoding="utf-8")
+    (DOCS / "api" / "endpoints.md").write_text(api_md, encoding="utf-8")
+    (DOCS / "mcp" / "tools.md").write_text(mcp_md, encoding="utf-8")
 
     (DOCS / "reference" / "index.md").write_text(
         HEADER
@@ -164,6 +368,7 @@ def render(manifest: dict) -> None:
         + "| 传输契约 | [transport.md](../assets/docs/api/transport.md.txt) | 已按示例代码接入，4 项未确认、未与真实网关联调 |\n"
         + "| 解析踩坑 | [catalog.md](../assets/docs/catalog.md.txt) | 真源链、易误判事实、升版流程 |\n"
         + "| 能力矩阵 | [capabilities.md](capabilities.md) | [生成] 由 `contract/capabilities.json` 派生 |\n"
+        + "| 端点参考 | [endpoints.md](../api/endpoints.md) | [生成] 路由、参数、示例 |\n"
         + "| 契约治理 | [分册升版](../guides/contract-governance.md) | 真源→派生、升版六步 |\n"
         + "| 能力级契约 | [service.yaml](../assets/openapi/service.yaml) | 对外 6 条路径，含 `degrade_reason` |\n"
         + "| 跨语言行为 | `contract/vectors.json` | 报文 / 错误码 / 信封的黄金向量（不进公开快照，见主仓） |\n\n"
@@ -172,9 +377,6 @@ def render(manifest: dict) -> None:
         + "    SDK 用候选路径试探，联调后需按主仓 `docs/api/transport.md` 收敛。\n",
         encoding="utf-8",
     )
-
-    capabilities_md = render_capabilities()
-    (DOCS / "contract" / "capabilities.md").write_text(capabilities_md, encoding="utf-8")
 
     changelog = UPSTREAM / "CHANGELOG.md"
     changelog_md = HEADER + (
@@ -185,13 +387,16 @@ def render(manifest: dict) -> None:
     (DOCS / "llms.txt").write_text(
         "# altdatahub 文档\n\n"
         "> 第三方 SDK 文档：离线目录可用；在线查询未与真实网关联调，不伪造数据。\n\n"
-        "## 入门\n- [首页](index.md)\n- [安装与离线 CLI](getting-started/install.md)\n"
-        "## 指南\n- [Python SDK](guides/python.md)\n- [多语言 SDK](guides/sdks.md)\n"
-        "- [能力服务部署](guides/service.md)\n- [MCP 与 Agent Skill](guides/ai-integration.md)\n"
-        "- [排障 FAQ](guides/troubleshooting.md)\n- [契约治理与分册升版](guides/contract-governance.md)\n"
-        "## 契约\n- [契约概览](contract/index.md)\n- [能力矩阵](contract/capabilities.md)\n"
+        "## API 文档\n- [总览与鉴权](api/index.md)\n- [端点参考](api/endpoints.md)\n"
+        "- [数据契约](contract/index.md)\n- [能力矩阵](contract/capabilities.md)\n"
         "- [原始文档镜像](reference/index.md)\n"
-        "## 其他\n- [变更记录](changelog.md)\n- [全文聚合](llms-full.txt)\n",
+        "## MCP 文档\n- [总览](mcp/index.md)\n- [Tools 参考](mcp/tools.md)\n"
+        "- [部署与配置](mcp/deploy.md)\n"
+        "## 开发工具\n- [安装与 CLI](getting-started/install.md)\n- [Python SDK](guides/python.md)\n"
+        "- [多语言 SDK](guides/sdks.md)\n- [能力服务部署](guides/service.md)\n"
+        "- [工具链与生成器](guides/toolchain.md)\n- [契约治理与分册升版](guides/contract-governance.md)\n"
+        "- [排障 FAQ](guides/troubleshooting.md)\n"
+        "## 入门 / 其他\n- [首页](index.md)\n- [变更记录](changelog.md)\n- [全文聚合](llms-full.txt)\n",
         encoding="utf-8",
     )
 
@@ -201,6 +406,8 @@ def render(manifest: dict) -> None:
         for path in handwritten_pages()
     ]
     derived_sections = [
+        ("派生页：api/endpoints.md", api_md),
+        ("派生页：mcp/tools.md", mcp_md),
         ("派生页：contract/capabilities.md", capabilities_md),
         ("派生页：changelog.md", changelog_md),
     ]
@@ -222,7 +429,7 @@ def render(manifest: dict) -> None:
         full.extend([f"## {title}", "", content, ""])
     (DOCS / "llms-full.txt").write_text("\n".join(full) + "\n", encoding="utf-8")
     print(
-        f"generated {len(rows)} reference assets, contract pages, changelog, "
+        f"generated {len(rows)} reference assets, api/mcp/contract pages, changelog, "
         f"llms*.txt ({len(sections)} sections)"
     )
 
