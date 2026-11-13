@@ -82,6 +82,9 @@
 - S2 收尾：`vectors.json` v2 已被 7 语言全量参数化消费，各语言自建 HTTP server 的 wire parity
   降级为可选增强（避免重复投入）；真正的缺口是**重试执行器**——SDK 目前只有 `retryable`
   标记与 hint，没有实际重试，超时/传输失败分类则已由 `tests/test_http_transport.py` 覆盖。
+- **A 方案已验证**：内置 `CNB_TOKEN` 能推送到 Private 文档仓；主仓 `main.push` 产生
+  `docs: sync snapshot <sha>` 提交（作者 `h1s97x <yang1297656998@outlook.com>`），
+  文档仓 CI 自动跑通 `mkdocs build --strict`。
 - 砍掉 `parity-results.json` 运行时汇总：静态 PARITY 标记 + 各语言全量参数化 + CI
   已能发现漏接，跨并行 job 传递产物收益不抵复杂度，避免又多一份需同步的生成物。
 
