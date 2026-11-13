@@ -24,6 +24,7 @@ DOCS = ROOT / "docs"
 ASSETS = DOCS / "assets"
 GENERATED_DIRS = (DOCS / "contract", DOCS / "reference", ASSETS)
 GENERATED_FILES = (DOCS / "changelog.md", DOCS / "llms.txt", DOCS / "llms-full.txt")
+GENERATED_TOP_DIRS = {"contract", "reference", "assets"}
 HEADER = "<!-- 由 scripts/build_docs.py 从 upstream/ 生成，勿手改 -->\n\n"
 CAPABILITIES_REL = "contract/capabilities.json"
 # 主仓快照已脱敏；这里是第二道防线，防止脱敏规则失效后把内网地址发布出去。
@@ -61,6 +62,16 @@ def verify(manifest: dict) -> list[str]:
 
 def asset_rel(rel: str) -> str:
     return f"assets/{rel}.txt" if rel.endswith(".md") else f"assets/{rel}"
+
+
+def handwritten_pages() -> list[Path]:
+    """站点手写页（非生成物），按路径排序，供 llms-full 全文聚合。"""
+    return sorted(
+        path
+        for path in DOCS.rglob("*.md")
+        if path.relative_to(DOCS).parts[0] not in GENERATED_TOP_DIRS
+        and path.name != "changelog.md"
+    )
 
 
 def render_capabilities() -> str:
@@ -119,7 +130,7 @@ def render(manifest: dict) -> None:
             path.unlink()
 
     rows: list[str] = []
-    full = ["# altdatahub 文档全文", "", "> 由 scripts/build_docs.py 从 upstream/ 聚合，勿手改。", ""]
+    snapshot_sections: list[tuple[str, str]] = []
     for item in manifest.get("files", []):
         rel = item["path"]
         src = UPSTREAM / rel
@@ -131,7 +142,7 @@ def render(manifest: dict) -> None:
         dest.write_text(content, encoding="utf-8")
         rows.append(f"| `{rel}` | [原文](../{asset_rel(rel)}) |")
         if rel.endswith(".md"):
-            full.extend([f"## {rel}", "", content, ""])
+            snapshot_sections.append((f"快照原文：{rel}", content))
 
     (DOCS / "reference" / "index.md").write_text(
         HEADER
@@ -153,6 +164,7 @@ def render(manifest: dict) -> None:
         + "| 传输契约 | [transport.md](../assets/docs/api/transport.md.txt) | 已按示例代码接入，4 项未确认、未与真实网关联调 |\n"
         + "| 解析踩坑 | [catalog.md](../assets/docs/catalog.md.txt) | 真源链、易误判事实、升版流程 |\n"
         + "| 能力矩阵 | [capabilities.md](capabilities.md) | [生成] 由 `contract/capabilities.json` 派生 |\n"
+        + "| 契约治理 | [分册升版](../guides/contract-governance.md) | 真源→派生、升版六步 |\n"
         + "| 能力级契约 | [service.yaml](../assets/openapi/service.yaml) | 对外 6 条路径，含 `degrade_reason` |\n"
         + "| 跨语言行为 | `contract/vectors.json` | 报文 / 错误码 / 信封的黄金向量（不进公开快照，见主仓） |\n\n"
         + "!!! warning \"响应信封仍未确认\"\n"
@@ -163,13 +175,12 @@ def render(manifest: dict) -> None:
 
     capabilities_md = render_capabilities()
     (DOCS / "contract" / "capabilities.md").write_text(capabilities_md, encoding="utf-8")
-    full.extend(["## contract/capabilities.json（派生能力矩阵）", "", capabilities_md, ""])
 
     changelog = UPSTREAM / "CHANGELOG.md"
-    (DOCS / "changelog.md").write_text(
-        HEADER + (changelog.read_text(encoding="utf-8") if changelog.is_file() else "# 变更记录\n\n等待主仓快照。\n"),
-        encoding="utf-8",
+    changelog_md = HEADER + (
+        changelog.read_text(encoding="utf-8") if changelog.is_file() else "# 变更记录\n\n等待主仓快照。\n"
     )
+    (DOCS / "changelog.md").write_text(changelog_md, encoding="utf-8")
 
     (DOCS / "llms.txt").write_text(
         "# altdatahub 文档\n\n"
@@ -177,13 +188,43 @@ def render(manifest: dict) -> None:
         "## 入门\n- [首页](index.md)\n- [安装与离线 CLI](getting-started/install.md)\n"
         "## 指南\n- [Python SDK](guides/python.md)\n- [多语言 SDK](guides/sdks.md)\n"
         "- [能力服务部署](guides/service.md)\n- [MCP 与 Agent Skill](guides/ai-integration.md)\n"
+        "- [排障 FAQ](guides/troubleshooting.md)\n- [契约治理与分册升版](guides/contract-governance.md)\n"
         "## 契约\n- [契约概览](contract/index.md)\n- [能力矩阵](contract/capabilities.md)\n"
         "- [原始文档镜像](reference/index.md)\n"
         "## 其他\n- [变更记录](changelog.md)\n- [全文聚合](llms-full.txt)\n",
         encoding="utf-8",
     )
+
+    # llms-full：手写页 + 快照原文 + 关键派生页，带编号目录，避免原文内部 ## 标题混淆层级。
+    site_sections = [
+        (f"站点页面：{path.relative_to(DOCS).as_posix()}", path.read_text(encoding="utf-8"))
+        for path in handwritten_pages()
+    ]
+    derived_sections = [
+        ("派生页：contract/capabilities.md", capabilities_md),
+        ("派生页：changelog.md", changelog_md),
+    ]
+    sections = site_sections + snapshot_sections + derived_sections
+    # [NN] 前缀保证章节标题唯一，不会被快照原文里恰好以数字开头的 ## 标题冒充。
+    titles = [f"[{index:02d}] {title}" for index, (title, _) in enumerate(sections, 1)]
+    full = [
+        "# altdatahub 文档全文",
+        "",
+        "> 由 scripts/build_docs.py 从本站手写页与 upstream/ 快照聚合，勿手改。",
+        "> 章节按「站点页面 / 快照原文 / 派生页」分组并编号；原文内部的 `##` 标题不列入目录。",
+        "",
+        "## 目录",
+        "",
+        *[f"- {title}" for title in titles],
+        "",
+    ]
+    for title, (_, content) in zip(titles, sections):
+        full.extend([f"## {title}", "", content, ""])
     (DOCS / "llms-full.txt").write_text("\n".join(full) + "\n", encoding="utf-8")
-    print(f"generated {len(rows)} reference assets, contract pages, changelog, llms*.txt")
+    print(
+        f"generated {len(rows)} reference assets, contract pages, changelog, "
+        f"llms*.txt ({len(sections)} sections)"
+    )
 
 
 def main() -> int:

@@ -26,6 +26,23 @@ mkdocs build --strict        # 产物在 site/
 没有 `upstream/manifest.json` 时，`build_docs.py --check` 会失败；
 本地调试可先在主仓跑 `python tools/verify.py export`，把 `contract/snapshot/` 复制到 `upstream/`。
 
+## 搜索与版本化
+
+- **搜索**：显式声明 `plugins.search.lang: [en]`，`separator` 把全角空白与 CJK 标点作为断句边界；
+  Material 启用 `search.suggest` / `search.highlight` / `search.share`；关键页用 front matter
+  `search.boost` 提权。`scripts/check_site.py` 校验索引含中文页面、断句配置存在、且未误用 `lang: zh`。
+- **为什么不用 `lang: zh`**：`theme.language: zh` 会让 MkDocs 隐式推断成 `lang: [zh]`，而
+  Material 打包的 `lunr.zh.min.js` 在浏览器分支不传 `@node-rs/jieba`，worker 调用 `e.cut()`
+  会抛错。显式设 `en` 可绕开该语言包，中文内容仍完整进入索引。
+- **已知限制**：中文**词典分词**需要 `prebuild_index: node` + `@node-rs/jieba`（需 Node 工具链），
+  当前两侧构建只有 Python，所以是「中文标点断句 + 子串/前缀」匹配；
+  需要真分词时再在文档仓 CI 与 `pages.yml` 加 `actions/setup-node` 并改为预建索引。
+- **版本化 `mike` 暂未启用**：目前只有 `0.1.0` 单版本，且 `mike deploy` 默认推 `gh-pages` 分支，
+  与现有 `upload-pages-artifact` + `deploy-pages` 的 Actions 部署模式冲突。出现多版本需求时：
+  `requirements.txt` 加 pin 的 `mike` → `mkdocs.yml` 加 `extra.version.provider: mike` →
+  把 Pages 源改为 `gh-pages` 分支并用 `mike deploy --push --update-aliases <版本> latest`
+  （或保留 Actions 模式、用 `mike build` 生成版本化目录后上传）→ 同步改两侧流水线。
+
 ## 诚实口径
 
 - 离线目录能力（产品目录、字段字典）**完全可用**；

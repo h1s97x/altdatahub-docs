@@ -36,6 +36,7 @@ main:
               test -s "site/$f" || { echo "产物缺失或为空: site/$f"; exit 1; }
             done
             tar -tzf site.tar.gz | grep -q '^\./index.html$'
+            python scripts/check_site.py
             echo "site artifact ok: $(tar -tzf site.tar.gz | wc -l) entries"
 
     - name: sync-docs-to-github

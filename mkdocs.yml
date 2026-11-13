@@ -21,6 +21,9 @@ theme:
     - navigation.sections
     - navigation.top
     - content.code.copy
+    - search.suggest
+    - search.highlight
+    - search.share
 
 extra:
   generator: false
@@ -28,13 +31,22 @@ extra:
 markdown_extensions:
   - admonition
   - tables
+  - attr_list
   - toc:
       permalink: true
   - pymdownx.superfences
   - pymdownx.details
 
 plugins:
-  - search
+  - search:
+      # 不能设 lang: zh。Material 打包的 lunr.zh.min.js 在浏览器分支不传
+      # @node-rs/jieba，worker 调用 e.cut() 会抛错；而 theme.language: zh 会
+      # 让 MkDocs 隐式推断成 lang: [zh]。显式声明 en 可绕开该语言包。
+      lang:
+        - en
+      # 中文没有空格：把全角空白与 CJK 标点作为断句边界，避免整页成为一个 token。
+      # 这是断句级增强，不是词典分词（真分词需 Node + @node-rs/jieba，见 README）。
+      separator: '[\s\-\u3000-\u303f\uff00-\uffef\u200b]+'
 
 nav:
   - 首页: index.md
@@ -45,8 +57,10 @@ nav:
       - 多语言 SDK: guides/sdks.md
       - 能力服务部署: guides/service.md
       - MCP 与 Agent Skill: guides/ai-integration.md
+      - 排障 FAQ: guides/troubleshooting.md
   - 契约:
       - 数据 / 传输 / 错误码: contract/index.md
       - 能力矩阵: contract/capabilities.md
+      - 契约治理与分册升版: guides/contract-governance.md
       - 原始文档镜像: reference/index.md
   - 变更记录: changelog.md
