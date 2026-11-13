@@ -90,6 +90,17 @@ def handwritten_pages() -> list[Path]:
     )
 
 
+def page_text(path: Path) -> str:
+    """llms-full 用的纯文本：去 front matter；首页是 HTML 落地页，剥标签后可读性更好。"""
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r"\A---\n.*?\n---\n", "", text, count=1, flags=re.DOTALL)
+    if path == DOCS / "index.md":
+        text = re.sub(r"<[^>]+>", " ", text)
+        text = re.sub(r"[ \t]{2,}", " ", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip() + "\n"
+
+
 def render_capabilities(registry: dict) -> str:
     """由能力注册表生成能力矩阵页；快照尚无该文件时给占位页，保证 strict 不断链。"""
     if not registry["capabilities"]:
@@ -402,7 +413,7 @@ def render(manifest: dict) -> None:
 
     # llms-full：手写页 + 快照原文 + 关键派生页，带编号目录，避免原文内部 ## 标题混淆层级。
     site_sections = [
-        (f"站点页面：{path.relative_to(DOCS).as_posix()}", path.read_text(encoding="utf-8"))
+        (f"站点页面：{path.relative_to(DOCS).as_posix()}", page_text(path))
         for path in handwritten_pages()
     ]
     derived_sections = [

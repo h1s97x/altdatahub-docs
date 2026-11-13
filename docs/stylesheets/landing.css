@@ -1,0 +1,407 @@
+/* 首页介绍页专用样式：纯 CSS，不加载任何外部字体 / 图标 / CDN。 */
+
+:root {
+  --ld-accent: #3f51b5;
+  --ld-accent-2: #00a5e0;
+  --ld-ink: #1b2030;
+  --ld-muted: #5c6470;
+  --ld-surface: rgba(63, 81, 181, 0.05);
+  --ld-surface-2: rgba(0, 165, 224, 0.05);
+  --ld-border: rgba(63, 81, 181, 0.16);
+  --ld-shadow: 0 10px 30px rgba(31, 45, 90, 0.10);
+  --ld-shadow-hover: 0 18px 44px rgba(31, 45, 90, 0.18);
+}
+
+[data-md-color-scheme="slate"] {
+  --ld-accent: #aab2ff;
+  --ld-accent-2: #4dd0ff;
+  --ld-ink: #eef1ff;
+  --ld-muted: #a6adbb;
+  --ld-surface: rgba(170, 178, 255, 0.08);
+  --ld-surface-2: rgba(77, 208, 255, 0.07);
+  --ld-border: rgba(170, 178, 255, 0.22);
+  --ld-shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
+  --ld-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+.md-main:has(.landing) .md-content__inner {
+  max-width: 78rem;
+}
+
+.md-main:has(.landing) .md-content {
+  padding-bottom: 0;
+}
+
+.landing {
+  color: var(--ld-ink);
+  line-height: 1.7;
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  color: var(--ld-ink);
+  border: 0;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing p {
+  margin: 0;
+}
+
+.landing a {
+  text-decoration: none;
+}
+
+/* ---------- Hero ---------- */
+
+.landing-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid var(--ld-border);
+  background:
+    radial-gradient(900px 420px at 12% -20%, rgba(0, 165, 224, 0.20), transparent 65%),
+    radial-gradient(760px 420px at 92% 10%, rgba(63, 81, 181, 0.26), transparent 62%),
+    linear-gradient(140deg, var(--ld-surface), var(--ld-surface-2));
+  box-shadow: var(--ld-shadow);
+  padding: clamp(2rem, 6vw, 4.5rem);
+  margin-bottom: 2.5rem;
+}
+
+.landing-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(63, 81, 181, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(63, 81, 181, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(120deg, #000, transparent 78%);
+  pointer-events: none;
+}
+
+.landing-hero::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -90px;
+  bottom: -180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 165, 224, 0.22), transparent 68%);
+  pointer-events: none;
+}
+
+.landing-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 44rem;
+}
+
+.landing-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ld-accent);
+  border: 1px solid var(--ld-border);
+  background: var(--ld-surface);
+  border-radius: 999px;
+  padding: 0.32rem 0.9rem;
+  margin-bottom: 1.4rem !important;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2.1rem, 5.2vw, 3.5rem);
+  line-height: 1.18;
+  margin-bottom: 1.1rem !important;
+}
+
+.landing-hero h1 span {
+  background: linear-gradient(100deg, var(--ld-accent), var(--ld-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-lead {
+  font-size: clamp(1rem, 1.7vw, 1.16rem);
+  color: var(--ld-muted);
+  max-width: 38rem;
+  margin-bottom: 1.6rem !important;
+}
+
+.landing-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.landing-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ld-ink);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--ld-border);
+  border-radius: 8px;
+  padding: 0.3rem 0.72rem;
+}
+
+[data-md-color-scheme="slate"] .landing-badge {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.landing .md-button {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 0.62rem 1.25rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.landing .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ld-shadow);
+}
+
+.landing .md-button--primary {
+  background: linear-gradient(100deg, var(--ld-accent), var(--ld-accent-2));
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ---------- 指标 ---------- */
+
+.landing-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 3.4rem;
+}
+
+.landing-metric {
+  text-align: center;
+  border: 1px solid var(--ld-border);
+  border-radius: 16px;
+  background: var(--ld-surface);
+  padding: 1.25rem 0.6rem;
+}
+
+.landing-metric strong {
+  display: block;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  line-height: 1.1;
+  font-weight: 800;
+  background: linear-gradient(100deg, var(--ld-accent), var(--ld-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-metric span {
+  font-size: 0.82rem;
+  color: var(--ld-muted);
+}
+
+/* ---------- 板块与特性 ---------- */
+
+.landing-section {
+  margin-bottom: 3.4rem;
+}
+
+.landing-kicker {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--ld-accent);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem !important;
+}
+
+.landing-section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin-bottom: 1.6rem !important;
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.landing-card {
+  display: block;
+  border: 1px solid var(--ld-border);
+  border-radius: 18px;
+  background: var(--ld-surface);
+  padding: 1.6rem;
+  box-shadow: var(--ld-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.landing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--ld-shadow-hover);
+  border-color: var(--ld-accent);
+}
+
+.landing-card__index {
+  display: inline-grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ld-accent), var(--ld-accent-2));
+  margin-bottom: 1rem;
+}
+
+.landing-card h3 {
+  font-size: 1.14rem;
+  margin-bottom: 0.5rem !important;
+}
+
+.landing-card p {
+  color: var(--ld-muted);
+  font-size: 0.92rem;
+}
+
+.landing-card__more {
+  display: inline-block;
+  margin-top: 0.9rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ld-accent);
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.9rem;
+}
+
+.landing-feature {
+  border-left: 3px solid var(--ld-accent);
+  border-radius: 0 12px 12px 0;
+  background: var(--ld-surface);
+  padding: 1rem 1.2rem;
+}
+
+.landing-feature h3 {
+  font-size: 0.98rem;
+  margin-bottom: 0.35rem !important;
+}
+
+.landing-feature p {
+  color: var(--ld-muted);
+  font-size: 0.88rem;
+}
+
+/* ---------- 快速开始 / 诚实口径 / 页脚 ---------- */
+
+.landing-quick {
+  border: 1px solid var(--ld-border);
+  border-radius: 18px;
+  background: var(--ld-surface);
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+}
+
+.landing-quick h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem !important;
+}
+
+.landing-quick pre {
+  background: #12172a;
+  color: #e6ebff;
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto;
+  font-size: 0.86rem;
+  line-height: 1.8;
+  margin: 0 0 0.9rem;
+}
+
+.landing-quick pre code {
+  color: inherit;
+  background: transparent;
+}
+
+.landing-quick p {
+  color: var(--ld-muted);
+  font-size: 0.9rem;
+}
+
+.landing-note {
+  border: 1px solid rgba(255, 167, 38, 0.45);
+  border-left: 4px solid #ffa726;
+  border-radius: 0 14px 14px 0;
+  background: rgba(255, 167, 38, 0.08);
+  padding: 1.3rem 1.5rem;
+  margin-bottom: 2.4rem;
+}
+
+.landing-note strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 1rem;
+}
+
+.landing-note p {
+  color: var(--ld-muted);
+  font-size: 0.9rem;
+}
+
+.landing-footer {
+  border-top: 1px solid var(--ld-border);
+  padding: 1.6rem 0 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+  font-size: 0.86rem;
+}
+
+.landing-footer a {
+  color: var(--ld-accent);
+  font-weight: 600;
+}
+
+.landing-footer span {
+  color: var(--ld-muted);
+  margin-right: 0.4rem;
+}
+
+@media (max-width: 760px) {
+  .landing-hero {
+    border-radius: 16px;
+    padding: 1.7rem 1.3rem;
+  }
+  .landing-actions .md-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing .md-button,
+  .landing-card {
+    transition: none;
+  }
+  .landing .md-button:hover,
+  .landing-card:hover {
+    transform: none;
+  }
+}

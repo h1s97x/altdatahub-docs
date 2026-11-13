@@ -35,6 +35,21 @@ def check_pages() -> list[str]:
     return [f"site/{rel} 缺失" for rel in REQUIRED_PAGES if not (SITE / rel).is_file()]
 
 
+def check_landing() -> list[str]:
+    problems: list[str] = []
+    css = SITE / "stylesheets" / "landing.css"
+    if not css.is_file() or css.stat().st_size == 0:
+        problems.append("site/stylesheets/landing.css 缺失或为空")
+    home = SITE / "index.html"
+    if not home.is_file():
+        return problems + ["site/index.html 缺失"]
+    text = home.read_text(encoding="utf-8")
+    for word in ("landing-hero", "landing-metrics", "landing-card", "API 文档", "MCP 文档", "开发工具", "诚实口径"):
+        if word not in text:
+            problems.append(f"首页缺关键元素：{word}")
+    return problems
+
+
 def check_llms_txt() -> list[str]:
     path = SITE / "llms.txt"
     if not path.is_file():
@@ -105,7 +120,9 @@ def check_search_index() -> list[str]:
 
 
 def main() -> int:
-    problems = check_pages() + check_llms_txt() + check_llms_full() + check_search_index()
+    problems = (
+        check_landing() + check_pages() + check_llms_txt() + check_llms_full() + check_search_index()
+    )
     for problem in problems:
         print(f"  - {problem}", file=sys.stderr)
     if problems:

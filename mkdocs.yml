@@ -28,6 +28,9 @@ theme:
 extra:
   generator: false
 
+extra_css:
+  - stylesheets/landing.css
+
 markdown_extensions:
   - admonition
   - tables

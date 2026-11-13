@@ -39,6 +39,11 @@ mkdocs build --strict        # 产物在 site/
 生成页的真源是 `upstream/contract/capabilities.json` 与脱敏快照；手写页与生成页同目录时，
 `build_docs.py` 只删指定生成文件，不会误删手写页。`scripts/check_site.py` 校验三大板块关键页。
 
+首页 `docs/index.md` 是产品级介绍落地页（Hero / 数据指标 / 三大板块卡片 / 特性网格 /
+快速开始 / 诚实口径横幅），样式在 `docs/stylesheets/landing.css`：纯 CSS、无外部字体与 CDN，
+兼容暗色模式与移动端。`build_docs.py` 聚合 `llms-full.txt` 时会剥掉首页的 HTML 标签，
+保持 AI 全文可读；`check_site.py` 校验样式文件与首页关键结构都已发布。
+
 **与商业数据文档站的差别（刻意保留）**：本站不提供在线调试台、试用 Token 或可公开调用的
 接口 —— 在线链路尚未与真实 EDS 网关联调，做假调试界面等于编造数据。所有在线示例都明确
 标注「未联调 / 缺凭据显式降级」。
