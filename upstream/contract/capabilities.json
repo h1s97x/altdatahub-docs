@@ -2,7 +2,7 @@
   "version": 1,
   "note": "能力、路由、MCP tool、Skill 命令与降级口径的唯一真源。错误码不在此复制，运行时/文档从 src/altdatahub/errors.py 的 EDS_ERROR_CODES 读取。派生文件由 tools/verify.py sync 生成，勿手改。",
   "errorCodeSource": "src/altdatahub/errors.py:EDS_ERROR_CODES",
-  "gatewayNote": "EDS 网关联调未完成：已取得真实错误响应与门户成功响应样例，响应信封（data[].data）与错误码字段名（code / msg）已确认；各产品服务号清单仍待确认，且账号权限尚未开通、尚无一次成功的在线查询，见 docs/api/transport.md。请勿把空数据当作「确无记录」。",
+  "gatewayNote": "EDS 网关已完成一次真实在线查询（2026-11-16，S0101）：响应信封（data[].data）与错误码字段名（code / msg）已由真实响应确认；其余 50 个产品的服务号清单仍待确认，见 docs/api/transport.md。请勿把空数据当作「确无记录」。",
   "degradeReasons": {
     "configuration": "未配置 EDS 网关公共参数",
     "validation": "请求参数不合法",
