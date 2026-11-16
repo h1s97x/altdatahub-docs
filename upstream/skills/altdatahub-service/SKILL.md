@@ -23,8 +23,9 @@ altdatahub-service/
 
 ## 诚实口径（最重要）
 
-**EDS 网关联调未完成**：响应信封与错误码字段名已确认，`docs/api/transport.md` 仍有 2 项
-（各产品服务号清单、`eds_validday` 类型）未确认，且账号权限待开通。
+**EDS 网关已完成一次真实在线查询**（2026-11-16，S0101，HTTP 200 / 1 行）：响应信封与
+错误码字段名已确认；S0101 之外仍有 2 项（各产品服务号清单、`eds_validday` 类型）未确认，
+见 `docs/api/transport.md`。
 `query` 能力在服务端未配置 `EDS_*` 公共参数时返回
 `success=false` + `degrade_reason=未配置 EDS 网关公共参数`。
 
@@ -79,7 +80,7 @@ python -c "import os; print('OK' if os.getenv('ALTDATAHUB_SERVICE_URL') and os.g
 - `success=true`：按用户语言整理；`row_count` 与 `rows` 一并说明
 - `success=true` 但 `row_count=0`：说「未查询到相关记录」，**不是接口故障**
 - `success=false`：转述 `error` / `degrade_reason` / `hint`，按错误分类给建议
-- 任何响应都带 `note`：EDS 网关信封与服务号待确认，不要把空数据当结论
+- 任何响应都带 `note`：S0101 已验证，其余产品服务号待确认，不要把空数据当结论
 - 严禁把目录里的**字段定义**（例如 S0101 有 `legalRep` 字段）当成查到的**真实数据**
 
 ## 错误分类
@@ -115,4 +116,4 @@ python -c "import os; print('OK' if os.getenv('ALTDATAHUB_SERVICE_URL') and os.g
 | 能力矩阵与错误码 | `references/catalog.md` |
 | 执行脚本 | `scripts/query.py` |
 | 服务契约 | 仓库 `openapi/service.yaml` |
-| 未联调清单 | 仓库 `docs/api/transport.md` |
+| 服务号待确认清单 | 仓库 `docs/api/transport.md` |

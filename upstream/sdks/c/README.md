@@ -8,7 +8,8 @@
 - 10 个大类方法、`productCode` 枚举、错误契约、报文组装与响应解包
 - 与 Python / TypeScript / Java / Go / C# / Rust 读**同一份**
   [`contract/vectors.json`](../../contract/vectors.json)
-- 传输契约仍未与真实网关联调，见仓库根 [`docs/api/transport.md`](../../docs/api/transport.md)
+- 传输契约已在 S0101 完成真实在线查询验证；其余产品的服务号清单仍待确认，
+  见仓库根 [`docs/api/transport.md`](../../docs/api/transport.md)
 
 ## 构建与测试
 

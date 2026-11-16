@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+### 真实网关联调完成（2026-11-16，S0101）
+
+- 经能力服务 `POST /v1/query/S0101` 完成一次真实在线查询：HTTP 200 / 1 行，
+  业务参数 `entName` / `idNum` / `idType` / `queryReason` 平铺可用，`rows` 里直接是
+  `altdatahub schema S0101` 定义的业务字段，`data[].data` 展平链路端到端验证通过。
+  原始报文与企业数据留在内网机器，公开口径只记结构。
+- 响应形状与 `contract/vectors.json` v3 的展平 case 一致，**无需升向量版本**；
+  7 语言 consumer 的 `PARITY_VECTOR_VERSION: 3` 保持不变。
+- 服务号映射仍为 `izxzx{product_code}` 模板：S0101 已验证，其余 50 个产品的服务号清单
+  仍待确认，`eds_validday` 原文类型同样未取得；这两项不阻塞 S0101 上线，见
+  `docs/api/transport.md`。
+- `/v1/ping` 的 `gateway_contract_status` 由 `pending_real_gateway_validation` 改为
+  `partially_validated_s0101`，如实表达「仅 S0101 已验证」；README / AGENTS / transport /
+  service / MCP / Skill / C SDK / Web 控制台 / `openapi/service.yaml` 口径同步。
+- `tests/test_integration.py`：真实联调用例（默认被 `integration` marker 排除），只断言结构
+  不变量（展平 / 强类型 / `raw` / 缺凭据显式失败）；凭据与测试参数全走环境变量，缺则跳过，
+  不入库任何真实企业名或证件号。
+
 ### 新增
 
 - `service/console_cli.py`：纯标准库交互式联调 CLI，问答填 4 个必填业务参数，支持

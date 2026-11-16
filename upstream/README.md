@@ -15,12 +15,12 @@
 | 产品目录（51 个 `productCode`、557 个顶层字段、12 个子结构 / 397 个字段） | ✅ 可用 | 由分册 PDF 解析生成，含中文名 / 类型 / 长度 / 非空 |
 | 强类型模型（51 + 12 个 dataclass） | ✅ 可用 | 未知字段落 `raw`，前向兼容 |
 | 10 个大类方法 + `productCode` 枚举 | ✅ 可用 | 类别与编码不匹配时**本地**报错 |
-| 传输层（POST 到 EDS 网关） | ✅ 已实现 | 按《接口规范》示例代码逐字段对齐；**未与真实网关联调** |
+| 传输层（POST 到 EDS 网关） | ✅ 已验证 | 按《接口规范》示例代码逐字段对齐；S0101 真实查询 HTTP 200 / 1 行 |
 | 业务错误码（1000/2000/3000/9999） | ✅ 已实现 | 按值判定，带 `category` / `retryable` / `hint`，OpenAPI 有 `x-error-codes` |
 | 响应信封 | ✅ 已确认 | `data[].data` 两层按展平解包；错误码 `code` / 描述 `msg` |
-| **能力服务 / MCP / Skill** | ✅ 骨架可用 | 独立部署的 HTTP 服务 + AI 接入层；**离线目录能力完全可用，在线查询仍需 `EDS_*` 凭据与一次真实响应联调**，见下节 |
+| **能力服务 / MCP / Skill** | ✅ 可用 | 独立部署的 HTTP 服务 + AI 接入层；**离线目录完全可用，S0101 在线查询已验证**；其余产品仍需 `EDS_*` 凭据，见下节 |
 
-仍未确认 2 项：各产品服务号清单、`eds_validday` 类型原文，详见
+S0101 之外仍未确认 2 项：各产品服务号清单、`eds_validday` 类型原文，详见
 [`docs/api/transport.md`](docs/api/transport.md)。**没有签名环节** —— 示例代码里鉴权只靠
 `eds_account` 授权串，本 SDK 不发明签名字段。
 
@@ -300,9 +300,10 @@ docker compose -f service/compose.yml --env-file .env up -d --build   # 只绑�
 | MCP | `mcp/README.md` | `python -m mcp`（stdio）或 `python -m mcp --http`（`POST /mcp`） |
 | Agent Skill | `skills/altdatahub-service/SKILL.md` | 先查目录定 productCode，再查字段字典，最后才发在线查询 |
 
-**在线查询仍是显式降级**：EDS 网关联调未完成（账号权限待开通），服务端没配 `EDS_*`
-时返回 `success=false` + `degrade_reason=未配置 EDS 网关公共参数`，不伪造数据。
-拿到凭据与一份真实响应后，需按 `docs/api/transport.md` 把信封 / 服务号钉死。
+**在线查询已验证（S0101），缺配置仍显式降级**：2026-11-16 经能力服务完成一次真实查询
+（HTTP 200 / 1 行，响应字段与 `altdatahub schema S0101` 一致）；服务端没配 `EDS_*` 时
+仍返回 `success=false` + `degrade_reason=未配置 EDS 网关公共参数`，不伪造数据。
+其余产品的服务号清单拿到后，按 `docs/api/transport.md` 把拼装模板改为显式映射。
 调用方只持服务地址 + 调用方 Token，`EDS_ACCOUNT` 等 8 个公共参数只在服务端。
 
 生产形态用 `service/compose.internal.yml`（不发布端口，只加入调用方网络）；

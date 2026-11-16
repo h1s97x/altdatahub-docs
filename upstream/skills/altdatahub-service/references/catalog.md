@@ -52,7 +52,7 @@
   "retryable": false,
   "degrade_reason": "未配置 EDS 网关公共参数",
   "hint": "在服务端 .env 配置 EDS_BASE_URL / EDS_ACCOUNT / …",
-  "note": "EDS 网关联调未完成…"
+  "note": "EDS 网关已完成 S0101 真实查询；其余产品服务号待确认…"
 }
 ```
 

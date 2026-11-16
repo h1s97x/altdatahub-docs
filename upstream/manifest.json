@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@21e6d2c",
+  "source": "altdatahub@b6721fd",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -17,13 +17,13 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "9e4f246f596c6b55c19b1062e05ea13463b4ba3b1e732e00acec90371e5be8c3",
-      "bytes": 16759
+      "sha256": "68d8dbfbd1ac17250ffc00ca43b99ad7dd0ce392723d3cd2eb2f0c136744ad5e",
+      "bytes": 16880
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "e3c1281daffdb1f981605aeb731ca05da9ea811aef2a525d217b3f6913cefb59",
-      "bytes": 13944
+      "sha256": "263bfc001d3ebb068758cd254875a3b903629e2d0192b362cd0bcf1bd767edf8",
+      "bytes": 15343
     },
     {
       "path": "LICENSE",
@@ -37,8 +37,8 @@
     },
     {
       "path": "docs/api/transport.md",
-      "sha256": "cbdc32ea7b2118ea6b1202e8e6eae5429efaa4bf17bf5f3ab36fa9dfecad16c6",
-      "bytes": 5902
+      "sha256": "8af12af8ae70ac4191226137e1b2ca31c9c1c651bb987d97c6d8569f5ad4f4dd",
+      "bytes": 6233
     },
     {
       "path": "catalog/PRODUCTS.md",
@@ -47,8 +47,8 @@
     },
     {
       "path": "openapi/service.yaml",
-      "sha256": "42449ac9cc1928001801e692fc72f497bebcb63e52c373077d48449aa86166a5",
-      "bytes": 7394
+      "sha256": "46bb3d16c814b3ee2339d5eeff6328d4e49700cc17fff718a3e705c77e758a2c",
+      "bytes": 7471
     },
     {
       "path": "contract/capabilities.json",
@@ -57,23 +57,23 @@
     },
     {
       "path": "service/README.md",
-      "sha256": "786cad94bd47fa94020cf47444120eebafbbf20cf945bf03f432d91d8af6f621",
-      "bytes": 10908
+      "sha256": "dda6f9492e2c464447c559800ef967503dde68e3dfa90cc34053371890efc09a",
+      "bytes": 10929
     },
     {
       "path": "mcp/README.md",
-      "sha256": "5a700260cd3e05e73635a1397f06722804e94ceb6cc6cdc296a76a741a30a903",
-      "bytes": 4370
+      "sha256": "a3b7d97deb19d56aac222dbfeaddd88dee703bfc873fcf331cea9e10dbed5a4e",
+      "bytes": 4423
     },
     {
       "path": "skills/altdatahub-service/SKILL.md",
-      "sha256": "5696b3333efb2cad4ad74c1b9c08718b5696c4b3304eecd236db646d8bddc68d",
-      "bytes": 5392
+      "sha256": "a06f61e5863519b73aa6a57f4a8ed9a2082e30bc3eb5592592913a1abc460668",
+      "bytes": 5465
     },
     {
       "path": "skills/altdatahub-service/references/catalog.md",
-      "sha256": "417574032ec88597dc20d1ebf290e397abc39318785d110fdb268e3ccbd457d8",
-      "bytes": 4376
+      "sha256": "18360c0190f606e7a797c5f45f900d59fdba645e7bb29871f847a705c7f1403c",
+      "bytes": 4422
     },
     {
       "path": "sdks/typescript/README.md",
@@ -102,8 +102,8 @@
     },
     {
       "path": "sdks/c/README.md",
-      "sha256": "d09ffba3b3b863f82f3449371f816d54129af31720ec4dbbb0f6885acdce0982",
-      "bytes": 4292
+      "sha256": "f8a7ed740e3a5a014dfb5cfbbb4bbd3e51235405a7f19b613437e2c696f05014",
+      "bytes": 4356
     },
     {
       "path": "sdks/cpp/README.md",
