@@ -102,8 +102,11 @@ client.enterprise_basic(PRODUCT_CODES.S0101, entName="贵州茅台", page="1", p
 cd sdks/typescript && npm ci && npm test
 ```
 
+消费方 `npm install @h1s97x/altdatahub`；内网只配 scope 级 `.npmrc`，不改全局 registry
+（见 [`sdks/typescript/README.md`](sdks/typescript/README.md)）。
+
 ```ts
-import { HubClient, PRODUCT_CODES } from 'altdatahub';
+import { HubClient, PRODUCT_CODES } from '@h1s97x/altdatahub';
 
 const client = HubClient.fromEnv(); // 或 new HubClient(new MappingTransport({ ... })) 离线跑
 const rows = await client.enterpriseBasic(PRODUCT_CODES.S0101, { entName: '贵州茅台' });

@@ -10,6 +10,23 @@
 
 ## 安装与构建
 
+消费方安装（包名 `@h1s97x/altdatahub`，私有源与公开源均可）：
+
+```bash
+npm install @h1s97x/altdatahub
+```
+
+**内网场景**：不要改全局 `registry`，只在项目级 `.npmrc` 配 scope 级映射：
+
+```ini
+@h1s97x:registry=https://npm.cnb.cool/h1s97x/whccb/npm/-/packages/
+//npm.cnb.cool/h1s97x/whccb/npm/-/packages/:_authToken=${CNB_TOKEN}
+```
+
+公开源 `https://registry.npmjs.org/` 不需要额外配置（scoped 包已声明 `access: public`）。
+
+本仓库开发：
+
 ```bash
 cd sdks/typescript
 npm ci
@@ -17,10 +34,22 @@ npm run build      # tsc → dist/
 npm test           # build + node --test dist/tests/*.test.js
 ```
 
+## 发布
+
+发布只走 CNB 流水线，tag 带包前缀，版本必须与 `package.json` 一致：
+
+| tag | 目标 | 凭据 |
+|---|---|---|
+| `npm-v<version>` | CNB 私有 npm（先走通） | 内置 `${CNB_TOKEN}` |
+| `npmjs-v<version>` | npmjs.org（再补公开链路） | 密钥仓库的 `NPMJS_TOKEN` |
+
+tag 必须打在包含发布配置的 `main` 提交上（CNB 按 tag 所指提交读取 `.cnb.yml`）。
+两个 job 都会先校验版本、再 `npm view` 做幂等跳过，发布完成后从对应制品库安装并跑一次离线查询（`npm run smoke:published`）。
+
 ## 用法
 
 ```ts
-import { HubClient, PRODUCT_CODES, type S0101BasicProfile } from 'altdatahub';
+import { HubClient, PRODUCT_CODES, type S0101BasicProfile } from '@h1s97x/altdatahub';
 
 // 离线（把上游响应喂进模型层，不发网络请求）
 const offline = new HubClient(
