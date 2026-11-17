@@ -6,6 +6,15 @@
 
 ## [Unreleased]
 
+### 外网 direct 契约骨架（2026-11-17）
+
+- 服务层新增 `service/direct_adapter.py`：`EDS_MODE=direct` 只校验 `EDS_DIRECT_*`
+  合同字段（路径 / 认证 / 请求字段 / 响应路径 / 错误码字段），执行器未实现时明确降级，
+  不猜测签名 / 报文 / 信封，不影响 gateway 默认行为。
+- 新增 `service/service_codes.json`：默认模板 + 空 `overrides`，官方书面清单到位后只填映射；
+  `eds_validday` / 分页类型原文未到时用 `EDS_DIRECT_*_TYPE` 保留默认口径。
+- 骨架只在服务层，不进入 SDK 核心、生成物或 `contract/vectors.json`。
+
 ### 真实网关联调全量完成（2026-11-17）
 
 - 51 个 `productCode` 全部经能力服务在线查询验证：均返回 HTTP 200，部分产品 0 行为正常空结果；

@@ -104,6 +104,16 @@ httpPost.setEntity(new StringEntity(requestJson, Charset.forName("UTF-8")));
 另外一项未验证：**`page`/`pageSize` 示例传的是 `"demo"` 字符串，真实调用是否要求数字**
 （当前原样透传，不做类型转换）。
 
+### 待接入项的骨架（2026-11-17）
+
+- `EDS_MODE=direct` 只保留服务层契约骨架：`EDS_DIRECT_*` 变量校验路径、认证方式、
+  业务字段、响应路径和错误码字段；执行器尚未实现，配置齐全也只返回结构化降级，
+  不伪造 direct 响应。骨架不进入 SDK 核心与 `contract/vectors.json`。
+- `service/service_codes.json` 保存服务号模板 + `overrides` 空表；51 个产品的行为验证结果
+  记录为 `verifiedScope`，拿到官方清单后只补 `overrides`。
+- `EDS_DIRECT_VALID_DAY_TYPE` / `EDS_DIRECT_PAGE_PARAM_TYPE` 保留 `number|string` /
+  `string|number` 的默认口径；原文到位后不改主链路即可收窄。
+
 > 门户成功响应来自截图（非原始报文）；2026-11-16 / 11-17 经能力服务的多次真实在线查询中，
 > `rows` 里直接是业务字段（非主体外壳），与 `data[].data` 展平口径一致。
 > 原始报文留在内网机器、不出网；服务层仍按结构化降级如实返回，不把空数据当作「确无记录」。

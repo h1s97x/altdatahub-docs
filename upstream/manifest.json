@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@ec971d0",
+  "source": "altdatahub@7472a1c",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -22,8 +22,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "ce24c1d472888b7f22599cdfa875400f7901c113edb3a62473e76e50164cc854",
-      "bytes": 16200
+      "sha256": "4e5789b3ef95a3ea40fb096758eb618d3336f7d9f27f23a968248193b325e232",
+      "bytes": 16832
     },
     {
       "path": "LICENSE",
@@ -37,8 +37,8 @@
     },
     {
       "path": "docs/api/transport.md",
-      "sha256": "c1f88e8183a455eef8f33199bfbc98c8f753887162c1d3a6ea7bad84a77e89b9",
-      "bytes": 7011
+      "sha256": "5f3e444f71b0ef4f76311722f76cac1641007b903189d5882dd8cfd873048b4c",
+      "bytes": 7713
     },
     {
       "path": "catalog/PRODUCTS.md",
@@ -57,8 +57,8 @@
     },
     {
       "path": "service/README.md",
-      "sha256": "b9932d5c73d8f794067aa3186d76c36fe415d519b2d74d0672b3b3890ca2f1fd",
-      "bytes": 11310
+      "sha256": "7569707148c9f7f1458481a50c6a85cd073a54a36dfc828e6cc4a333d7058422",
+      "bytes": 11904
     },
     {
       "path": "mcp/README.md",

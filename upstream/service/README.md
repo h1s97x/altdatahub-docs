@@ -203,9 +203,17 @@ python service/issue_token.py --revoke analyst
 
 `EDS_MODE` 按**协议形态**而非网络位置选择上游适配器：
 
-- `gateway`（默认）：统一网关入口 + `eds_*` 平铺，当前唯一已接入形态；
-- `direct`：数据商原生 API。外网直连契约尚未提供，选择后 `/v1/query/*` 直接返回
-  `category=configuration` 的降级信封，明确不猜测字段、不回落到 `gateway`。
+- `gateway`（默认）：统一网关入口 + `eds_*` 平铺，唯一已接入形态；
+- `direct`：数据商原生 API。当前只提供**契约骨架**：`service/direct_adapter.py` 校验
+  `EDS_DIRECT_BASE_URL` / `EDS_DIRECT_PATH_TEMPLATE` / `EDS_DIRECT_AUTH_SCHEME` /
+  `EDS_DIRECT_REQUEST_FIELDS` / `EDS_DIRECT_RESPONSE_PATHS` / `EDS_DIRECT_ERROR_CODE_FIELD`
+  是否齐全；缺项会列出变量名，填齐后仍明确返回“外网直连执行器未实现”，不猜测签名/
+  报文/信封，不回落到 `gateway`。
+
+服务号由 `service/service_codes.json` 解析：默认模板 `izxzx{product_code}`，
+51 个产品的行为验证已通过；拿到官方清单后只填 `overrides`，不改代码。
+`eds_validday` / 分页参数类型原文未到时，分别用 `EDS_DIRECT_VALID_DAY_TYPE` 与
+`EDS_DIRECT_PAGE_PARAM_TYPE` 保留默认口径，不做类型猜测。
 
 ## 测试
 
