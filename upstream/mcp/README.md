@@ -26,9 +26,10 @@
 
 ## 诚实口径
 
-EDS 网关**已完成一次真实在线查询**（2026-11-16，S0101，HTTP 200 / 1 行）：响应信封
-（`data[].data`）与错误码字段名（`code` / `msg`）已确认；S0101 之外仍有 2 项未确认
-（服务号清单 / `eds_validday` 类型），见 `docs/api/transport.md`。
+EDS 网关**已完成全量在线验证**（2026-11-16 S0101；2026-11-17 其余 50 个产品）：
+51 个 `productCode` 经能力服务查询均返回 HTTP 200（部分 0 行为正常空结果），
+响应信封（`data[].data`）、错误码字段名（`code` / `msg`）与服务号模板 `izxzx{product_code}`
+已确认；仍有 1 项（`eds_validday` 类型原文）未确认，见 `docs/api/transport.md`。
 `altdatahub_query` 在未配置 `EDS_*` 时返回 `isError=true` 的**文本结果**，
 内容含 `degrade_reason: 未配置 EDS 网关公共参数` 与 `note`，模型应如实告知
 用户「数据源未接入」，**不能把降级当空数据，更不能编造记录**。

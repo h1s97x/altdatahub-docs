@@ -35,12 +35,12 @@
 ## 在线查询的诚实口径
 
 `docs/api/transport.md` 已确认响应信封（`data[].data` 两层）与错误码字段名（`code` / `msg`），
-仍有 2 项未确认：
+51 个产品已全量在线验证（部分 0 行为正常空结果），服务号模板 `izxzx<productCode>`
+全量可用。仍有 1 项未确认：
 
-1. 各产品服务号（前缀 `izxzx`，其余 50 个是否同为 `izxzx<productCode>`）
-2. `eds_validday` 的类型注释被截断（当前按示例代码传数字 `0`）
+1. `eds_validday` 的类型注释被截断（当前按示例代码传数字 `0`）
 
-另外 2 项未验证：是否所有产品共用同一 URL；`page`/`pageSize` 是否要求数字。
+另外 1 项未验证：`page`/`pageSize` 是否要求数字（当前原样透传）。
 
 **服务端没配 `EDS_*` 时**，`query` 返回：
 

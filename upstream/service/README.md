@@ -9,12 +9,12 @@
 | 能力 | 状态 |
 |---|---|
 | `/v1/categories`、`/v1/catalog`、`/v1/schema/{code}` | ✅ **完全可用**，纯离线产品目录，不需要网关 |
-| `/v1/query/{code}` | ✅ **S0101 已验证**（2026-11-16，HTTP 200 / 1 行）；其余产品需各自服务号 |
+| `/v1/query/{code}` | ✅ **51 个产品全量验证**（HTTP 200，部分 0 行为正常空结果） |
 
 仓库 `docs/api/transport.md` 已确认响应信封（`data[].data`）与错误码字段名（`code` / `msg`），
-且 S0101 已由真实在线查询验证整条链路；S0101 之外仍有 2 项未确认：各产品服务号清单、
-`eds_validday` 类型原文。**没有 `EDS_*` 凭据时在线查询返回 `success=false` + `degrade_reason`，
-不会伪造数据**；拿到服务号清单后把拼装模板改为显式映射。
+且 51 个产品已由真实在线查询验证整条链路，服务号模板 `izxzx{product_code}` 全量可用；
+仅剩 `eds_validday` 类型原文 1 项未确认。**没有 `EDS_*` 凭据时在线查询返回
+`success=false` + `degrade_reason`，不会伪造数据**；拿到官方服务号清单后把拼装模板改为显式映射。
 
 ## 启动
 
@@ -200,6 +200,12 @@ python service/issue_token.py --revoke analyst
 ## 环境变量
 
 见仓库根 `.env.example`。`EDS_*` 只在服务端；调用方只需服务地址 + 调用方 Token。
+
+`EDS_MODE` 按**协议形态**而非网络位置选择上游适配器：
+
+- `gateway`（默认）：统一网关入口 + `eds_*` 平铺，当前唯一已接入形态；
+- `direct`：数据商原生 API。外网直连契约尚未提供，选择后 `/v1/query/*` 直接返回
+  `category=configuration` 的降级信封，明确不猜测字段、不回落到 `gateway`。
 
 ## 测试
 

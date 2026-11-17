@@ -6,7 +6,18 @@
 
 ## [Unreleased]
 
-### 真实网关联调完成（2026-11-16，S0101）
+### 真实网关联调全量完成（2026-11-17）
+
+- 51 个 `productCode` 全部经能力服务在线查询验证：均返回 HTTP 200，部分产品 0 行为正常空结果；
+  默认服务号模板 `izxzx{product_code}` 全量可用，所有产品共用同一网关 URL。
+- 仅记录产品码与行数，不复述企业名、证件号或完整业务数据；用户回传的截图只覆盖部分产品，
+  其余由用户在内网侧逐条确认。
+- `/v1/ping` 的 `gateway_contract_status` 由 `partially_validated_s0101` 改为 `validated_all_51`；
+  README / AGENTS / transport / service / MCP / Skill / OpenAPI / todo 口径同步。
+- 仍未取得官方书面服务号清单，模板保留 `EDS_SERVICE_CODE_PATTERN` 可覆盖；`eds_validday`
+  类型原文与 `page`/`pageSize` 数字要求仍未确认，见 `docs/api/transport.md`。
+
+### 真实网关联调首验完成（2026-11-16，S0101）
 
 - 经能力服务 `POST /v1/query/S0101` 完成一次真实在线查询：HTTP 200 / 1 行，
   业务参数 `entName` / `idNum` / `idType` / `queryReason` 平铺可用，`rows` 里直接是

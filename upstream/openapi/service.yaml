@@ -6,9 +6,10 @@ info:
     调用方视角的「能力级」契约，与 openapi/openapi.yaml 的 51 个服务商逻辑接口
     /products/{code} 不同。本服务把离线产品目录与通用查询收敛成 5 个端点，
     EDS 网关公共参数（8 个 eds_*）只在服务端，**无签名**，凭据不外泄。
-    诚实口径：EDS 网关已完成一次真实在线查询（2026-11-16，S0101，HTTP 200 / 1 行）；
-    响应信封（data[].data）与错误码字段名（code / msg）已确认，
-    S0101 之外的服务号清单仍待确认，见 docs/api/transport.md；
+    诚实口径：EDS 网关已完成全量在线验证（2026-11-16 S0101；2026-11-17 其余 50 个产品），
+    51 个 productCode 经能力服务查询均返回 HTTP 200（部分 0 行为正常空结果）；
+    响应信封（data[].data）与错误码字段名（code / msg）已确认，服务号按
+    izxzx{product_code} 模板全量可用，见 docs/api/transport.md；
     在线查询失败时返回结构化降级，不伪造数据。
 servers:
   - url: http://altdatahub-service:8802
