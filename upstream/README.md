@@ -94,7 +94,12 @@ client.enterprise_basic(PRODUCT_CODES.S0101, entName="贵州茅台", page="1", p
 
 完整清单（含每个产品的字段数与子结构）见 [`catalog/PRODUCTS.md`](catalog/PRODUCTS.md)。
 
-## TypeScript SDK
+## 多语言 SDK
+
+8 种语言统一在 `sdks/` 下，模型/端点/错误表由 `contract/catalog` + `tools/gen_code.py` 生成，
+CI `--check` 门禁保证一致。各语言 README 有完整用法，下面给最小示例。
+
+### TypeScript SDK
 
 `sdks/typescript/`，零运行时依赖（`fetch` + `node:test`）：
 
@@ -117,7 +122,7 @@ const rows = await client.enterpriseBasic(PRODUCT_CODES.S0101, { entName: '贵�
 `src/types.ts`（51 个产品接口 + 12 个子结构）由同一个生成器产出，`gen_code.py --check` 守着。
 详见 [`sdks/typescript/README.md`](sdks/typescript/README.md)。
 
-## Java SDK
+### Java SDK
 
 `sdks/java/`，Java 17 + `record`，唯一依赖 `jackson-databind`：
 
@@ -141,7 +146,7 @@ rows.get(0).entType();
 错误码表、重试语义、链路顺序与 Python / TypeScript 版一致，三边用同一份
 `contract/vectors.json` 断言。详见 [`sdks/java/README.md`](sdks/java/README.md)。
 
-## Go SDK
+### Go SDK
 
 `sdks/go/`，标准库零依赖（`net/http` + `encoding/json`）：
 
@@ -160,7 +165,7 @@ profile := rows[0].(*altdatahub.S0101BasicProfile)
 `types_gen.go`（51 个产品 struct + 12 个子结构）同样由 `tools/gen_code.py` 产出，**不许手改**。
 详见 [`sdks/go/README.md`](sdks/go/README.md)。
 
-## C# SDK
+### C# SDK
 
 `sdks/csharp/`，.NET 8 零 NuGet（`System.Text.Json` + `HttpClient`）：
 
@@ -180,7 +185,7 @@ var rows = client.EnterpriseBasic<S0101BasicProfile>("S0101",
 `Types.cs`（51 个产品 record + 12 个子结构）同样由 `tools/gen_code.py` 产出，**不许手改**。
 详见 [`sdks/csharp/README.md`](sdks/csharp/README.md)。
 
-## Rust SDK
+### Rust SDK
 
 `sdks/rust/`，`serde_json` + `ureq`（rustls，无系统库依赖，最低工具链 1.88）：
 
@@ -198,7 +203,7 @@ let rows: Vec<S0101BasicProfile> = client.enterprise_basic("S0101", params)?;
 `src/types.rs`（51 个产品 struct + 12 个子结构）同样由 `tools/gen_code.py` 产出，**不许手改**。
 详见 [`sdks/rust/README.md`](sdks/rust/README.md)。
 
-## C SDK
+### C SDK
 
 `sdks/c/`，C11 标准库 + libcurl，JSON 与模型都在仓内实现（不引第三方 JSON 库）：
 
@@ -222,7 +227,7 @@ ad_rows *rows = ad_client_query_by_code(client, "S0101", params, &error);
 `tests/test_contract_vectors.c` 与其它六种语言读同一份 `contract/vectors.json`；
 CI 里还会跑 ASan/UBSan 构建。详见 [`sdks/c/README.md`](sdks/c/README.md)。
 
-## C++ SDK
+### C++ SDK
 
 `sdks/cpp/` 是 **header-only 薄封装**，用 `extern "C"` 直接复用 C 库，不重复
 51+12 个模型、不改 `tools/gen_code.py`：
@@ -240,7 +245,7 @@ C++17 + 标准库，无需额外安装依赖；`make test` 会自动先构建 C 
 会同时跑 C 与 C++ 的测试（含 ASan/UBSan）。详见
 [`sdks/cpp/README.md`](sdks/cpp/README.md)。
 
-## 目录结构
+## 仓库结构
 
 ```
 catalog/
@@ -313,19 +318,25 @@ docker compose -f service/compose.yml --env-file .env up -d --build   # 只绑�
 生产形态用 `service/compose.internal.yml`（不发布端口，只加入调用方网络）；
 AI 客户端可另起 `mcp/compose.yml`。三者都由 `.ci-service` 进 CI。
 
-## 文档站
+## 文档入口
 
-文档站（MkDocs Material）在**独立仓库**，主仓不放站点文件、不加第三方依赖。
-两仓之间只传「脱敏后的文档契约快照」：
+| 目标 | 文档 |
+|---|---|
+| 架构：契约驱动 + 代码生成 | [`docs/architecture.md`](docs/architecture.md) |
+| 产品目录 / 51 个 productCode | [`docs/catalog.md`](docs/catalog.md) · [`catalog/PRODUCTS.md`](catalog/PRODUCTS.md) |
+| REST 传输契约 | [`docs/api/transport.md`](docs/api/transport.md) |
+| 契约驱动生成 | [`catalog/products.json`](catalog/products.json) · [`tools/gen_code.py`](tools/gen_code.py) |
+| 多语言 SDK 矩阵 | 各语言 README（`sdks/<lang>/README.md`） |
+| 能力服务 / MCP / Skill | [`service/README.md`](service/README.md) · [`mcp/README.md`](mcp/README.md) · [`skills/altdatahub-service/SKILL.md`](skills/altdatahub-service/SKILL.md) |
+
+文档站（MkDocs Material）在独立仓库，两仓之间只传脱敏后的快照：
 
 ```bash
 python tools/verify.py all       # 统一门禁：生成物 / 向量 / 链接 / 脱敏 / 快照
-python tools/verify.py export    # 只产快照：contract/snapshot/（含 manifest.json）
+python tools/verify.py export    # 只产快照：contract/snapshot/
 ```
 
-CI 的 `ci-contracts` 把快照打成 `docs-snapshot.tar.gz` 作为构建产物；
-**当前阶段只出产物、不部署**。文档仓地址、跨仓同步（方式 A）与 Pages 上线
-等事项见 [`todo.md`](todo.md)。
+CI 把快照打成 `docs-snapshot.tar.gz` 作为构建产物（当前不部署，见 [`todo.md`](todo.md)）。
 
 ## 开发
 

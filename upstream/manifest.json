@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@fffbf3f",
+  "source": "altdatahub@fed4622",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -17,8 +17,8 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "c7310de1d0df466737ec9a2142f8d204e156137d0c16acb7b4116611c9b66837",
-      "bytes": 17131
+      "sha256": "d868bb357555c81bb1585964b68657ade3b66b913a7c21743ba887fc7166eb0c",
+      "bytes": 17856
     },
     {
       "path": "CHANGELOG.md",
