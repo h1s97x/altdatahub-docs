@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@8a1cd1d",
+  "source": "altdatahub@8cb40ac",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
