@@ -247,7 +247,7 @@ catalog/
   products.json          数据契约真源（解析产物，勿手改）
   names_en.json          中文名 → 英文类名的显式映射（缺映射生成器直接失败）
   PRODUCTS.md            人读速查表（生成）
-src/altdatahub/
+sdks/python/altdatahub/
   models.py              51 + 12 个模型（生成）
   endpoints.py           10 个大类 + productCode 枚举
   client.py              大类方法 + query，传输可注入
@@ -284,7 +284,7 @@ openapi/service.yaml     调用方视角的能力级契约（与 openapi.yaml �
 .env.example             服务端环境变量模板
 ```
 
-Python SDK 在根目录（`src/`），其余语言在 `sdks/`，服务层在 `service/`。
+所有语言统一在 `sdks/`（Python 在 `sdks/python/`），服务层在 `service/`。
 
 ## 服务化与 AI 接入
 
@@ -293,7 +293,7 @@ SDK 是库，不会自己监听端口。若要把替代数据通接给主系统�
 
 ```bash
 cp .env.example .env                     # 填 EDS_* 与调用方 Token（.env 已 gitignore）
-PYTHONPATH=src python -m service        # 或直接跑，回环 8802
+PYTHONPATH=sdks/python python -m service        # 或直接跑，回环 8802
 docker compose -f service/compose.yml --env-file .env up -d --build   # 只绑回环
 ```
 
@@ -331,7 +331,7 @@ CI 的 `ci-contracts` 把快照打成 `docs-snapshot.tar.gz` 作为构建产物�
 
 ```bash
 python -m pytest tests/ -q --cov=altdatahub   # 覆盖率门禁 95%（CI 强制）
-python -m ruff check src/ tests/ tools/
+python -m ruff check sdks/python/ tests/ tools/
 python tools/gen_code.py --check              # 生成物必须与目录一致（CI 也跑）
 cd sdks/java && mvn verify                    # 改生成器后 Java 侧也要跑（67 个用例）
 cd sdks/go && gofmt -l . && go test ./...     # Go 侧（79 个用例）

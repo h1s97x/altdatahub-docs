@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@7472a1c",
+  "source": "altdatahub@dc89d09",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -10,20 +10,20 @@
     "requestParams": 2
   },
   "vectorsVersion": 3,
-  "generatorSha256": "78dfa53d3068df63b28ce4d1fc92c024b56841845e906ef4eef7069a1edc0c33",
+  "generatorSha256": "eadfd2d9dc7fc6ae36fa9b41552ab676e7d3a34e042e9f485a2fd695b2df2db9",
   "redactions": [
     "\\b80\\.37\\.0\\.103\\b -> <EDS_HOST>"
   ],
   "files": [
     {
       "path": "README.md",
-      "sha256": "4eb874cb3f2ed9eb7a0d90ca7f4340ed44e9bbb65312cc9129f78864ca38b304",
-      "bytes": 17103
+      "sha256": "c0928e9d9c8d80d7205491c982735de803953c783d7baafc1f739364963f4e8b",
+      "bytes": 17126
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "4e5789b3ef95a3ea40fb096758eb618d3336f7d9f27f23a968248193b325e232",
-      "bytes": 16832
+      "sha256": "d82b362c663fe8e3375bb0ab1ec8bd4440794c5299fd2beed73d51e17881bfb8",
+      "bytes": 16848
     },
     {
       "path": "LICENSE",
@@ -32,8 +32,8 @@
     },
     {
       "path": "docs/catalog.md",
-      "sha256": "3212dd8fd34bcace08467b0a0c3df3e6e9038b74d77f65e6ebb6bc6a023a39c7",
-      "bytes": 4114
+      "sha256": "5d0d311347cc7417964864575fd2c43a17e6aeb1827e8928add71a4c8d813360",
+      "bytes": 4130
     },
     {
       "path": "docs/api/transport.md",
@@ -52,13 +52,13 @@
     },
     {
       "path": "contract/capabilities.json",
-      "sha256": "c62d896cb5d3c8894ce7373818ccd5ae49071339d608d87aa5c56107258d65f1",
-      "bytes": 5478
+      "sha256": "4fcc55dc906b9c61fc9e41156e881bdcdec7cec0d46583fed51d3c9cdc3e085c",
+      "bytes": 5494
     },
     {
       "path": "service/README.md",
-      "sha256": "7569707148c9f7f1458481a50c6a85cd073a54a36dfc828e6cc4a333d7058422",
-      "bytes": 11904
+      "sha256": "9e1a0ea550265901da37c3ac8d41617ee3ec44f1d72cf5631ebb4d61cc7dc1c3",
+      "bytes": 11936
     },
     {
       "path": "mcp/README.md",

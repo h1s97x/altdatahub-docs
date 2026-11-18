@@ -10,8 +10,8 @@ catalog/products.json                   ← 数据契约真源
 catalog/names_en.json                   ← 中文名 → 英文类名的显式映射（缺映射即失败）
         │  tools/gen_code.py            （缺一即 CI 红）
         ▼
-src/altdatahub/models.py                  51 个产品 + 12 个子结构的强类型模型
-src/altdatahub/_data/products.json        随包分发的目录副本（与仓根必须逐字节一致）
+sdks/python/altdatahub/models.py                  51 个产品 + 12 个子结构的强类型模型
+sdks/python/altdatahub/_data/products.json        随包分发的目录副本（与仓根必须逐字节一致）
 openapi/openapi.yaml                    唯一 POST 入口 + 51 个 schema（0 errors，见 spectral）
 catalog/PRODUCTS.md                     人读速查表
 ```

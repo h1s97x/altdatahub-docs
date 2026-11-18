@@ -48,7 +48,7 @@
 
 - `service/console_cli.py`：纯标准库交互式联调 CLI，问答填 4 个必填业务参数，支持
   **网关探针**（直连 EDS 网关、原始响应落盘 0600、打印信封结构摘要）与**能力服务**两种模式；
-  不依赖 `src/altdatahub`，宿主机只需这一个文件 + 本地 `.env`。10 项不联网回归用例。
+  不依赖 `sdks/python/altdatahub`，宿主机只需这一个文件 + 本地 `.env`。10 项不联网回归用例。
 - `.gitignore`：忽略 `service/probe/` 与根 `/probe/`，防止含真实响应的探针产物误提交。
 
 ### 变更
@@ -124,7 +124,7 @@
 **能力编排（M2）**
 
 - `contract/capabilities.json` 成为能力 / 路由 / MCP tool / Skill 命令 / 降级文案的唯一真源；
-  错误码仍只从 `src/altdatahub/errors.py` 读，不复制码值。
+  错误码仍只从 `sdks/python/altdatahub/errors.py` 读，不复制码值。
 - `verify.py sync` 校验并生成 `service/capabilities.json`（含 `routes`）、`mcp/tools.json` 与
   Skill 参考的生成块；`all` 纳入只读版 `sync`。
 - `service/capabilities.py` 的能力名、`GATEWAY_NOTE`、5 处 `degrade_reason` 与

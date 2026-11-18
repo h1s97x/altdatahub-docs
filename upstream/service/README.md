@@ -1,6 +1,6 @@
 # altdatahub 能力服务
 
-把 `src/altdatahub/` SDK 包装成**长期运行的 HTTP 进程**，让调用方只发
+把 `sdks/python/altdatahub/` SDK 包装成**长期运行的 HTTP 进程**，让调用方只发
 「能力名 / productCode / 业务参数」，不接触 8 个 `eds_*` 公共参数、服务号拼装
 或 EDS 网关地址。**纯标准库，无需 pip install**（同仓 SDK 核心也是零依赖）。
 
@@ -20,7 +20,7 @@
 
 ```bash
 # 1) 直接跑（回环、无鉴权调试）
-PYTHONPATH=src python -m service
+PYTHONPATH=sdks/python python -m service
 curl http://127.0.0.1:8802/v1/ping
 
 # 2) 容器（只绑宿主机回环；容器内监听 0.0.0.0，SERVICE_AUTH_TOKEN 必填非空）
@@ -56,7 +56,7 @@ python3 service/console_cli.py --env-file .env --mode probe
 
 支持「改一个参数重发」「打印完整响应」「打印可复制的 `--params`」，缺必填项会当场提示。
 CLI 不回显 `EDS_*` 与 Token，落盘的请求体里 `eds_account` 脱敏、URL 主机脱敏为 `<EDS_HOST>`；
-凭据只读本地 `.env`，不进仓库。它不改变 `src/altdatahub/cli.py` 只做离线元数据的边界。
+凭据只读本地 `.env`，不进仓库。它不改变 `sdks/python/altdatahub/cli.py` 只做离线元数据的边界。
 
 ## aarch64 联调镜像（P0）
 
@@ -218,5 +218,5 @@ python service/issue_token.py --revoke analyst
 ## 测试
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s service/tests -v
+PYTHONPATH=sdks/python python -m unittest discover -s service/tests -v
 ```
