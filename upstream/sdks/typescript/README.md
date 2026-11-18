@@ -19,8 +19,8 @@ npm install @h1s97x/altdatahub
 **内网场景**：不要改全局 `registry`，只在项目级 `.npmrc` 配 scope 级映射：
 
 ```ini
-@h1s97x:registry=https://npm.cnb.cool/h1s97x/whccb/npm/-/packages/
-//npm.cnb.cool/h1s97x/whccb/npm/-/packages/:_authToken=${CNB_TOKEN}
+@h1s97x:registry=https://npm.cnb.cool/h1s97x/npm/-/packages/
+//npm.cnb.cool/h1s97x/npm/-/packages/:_authToken=${CNB_TOKEN}
 ```
 
 公开源 `https://registry.npmjs.org/` 不需要额外配置（scoped 包已声明 `access: public`）。
