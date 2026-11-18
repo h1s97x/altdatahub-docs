@@ -1,6 +1,6 @@
 # Changelog
 
-本文件记录面向使用者的变更。版本号以 `pyproject.toml` 的 `version` 为准；
+本文件记录面向使用者的变更。版本号以 `sdks/python/pyproject.toml` 的 `version` 为准；
 **0.1.0 已发布到 CNB PyPI 制品库 `h1s97x/pypi`**（未发布到 PyPI 官方），
 更早的历史变更以提交记录为准。
 
@@ -219,6 +219,6 @@
 - 明确 `pip install altdatahub` 暂不可用（PyPI 官方未发布），安装方式改为
   CNB PyPI 制品库 `h1s97x/pypi` 或仓库源码；说明 `integration` 测试标记目前无用例、
   为真实网关联调预留。
-- 发布链路：CNB PyPI 制品库不支持 `twine --skip-existing`，改为「仅在 `pyproject.toml`
+- 发布链路：CNB PyPI 制品库不支持 `twine --skip-existing`，改为「仅在 `sdks/python/pyproject.toml`
   变更时发布」（发新版先 bump 版本号）；`project.license` 改为 SPDX 字符串，
   消除 setuptools 的弃用警告。

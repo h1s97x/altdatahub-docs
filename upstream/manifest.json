@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "altdatahub@34d88d8",
+  "source": "altdatahub@8a1cd1d",
   "generatedBy": "tools/verify.py export",
   "catalog": {
     "products": 51,
@@ -22,8 +22,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "f80a3ccdce0a8e5f7d17ce93ce74dadfe53eb5aa64a485f23664b0e03d87060d",
-      "bytes": 16932
+      "sha256": "56a33778b9350db50416ba4e25e511722eebe8cec73b3f3f6cb1c3d89014af01",
+      "bytes": 16956
     },
     {
       "path": "LICENSE",
@@ -77,8 +77,8 @@
     },
     {
       "path": "sdks/typescript/README.md",
-      "sha256": "eb3f1f70757d6015cd1af95ca9a3bd8da03177ef158be25f15166aefb6fabde4",
-      "bytes": 4181
+      "sha256": "b879fe914c9ad6ad27fd3a281dbf9bac752346bd24829defe959584668ca0e4e",
+      "bytes": 4108
     },
     {
       "path": "sdks/java/README.md",

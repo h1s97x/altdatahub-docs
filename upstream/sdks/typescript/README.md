@@ -40,8 +40,7 @@ npm test           # build + node --test dist/tests/*.test.js
 
 | tag | 目标 | 凭据 |
 |---|---|---|
-| `npm-v<version>` | CNB 私有 npm（先走通） | 内置 `${CNB_TOKEN}` |
-| `npmjs-v<version>` | npmjs.org（再补公开链路） | 密钥仓库的 `NPMJS_TOKEN` |
+| `cli-v<version>` | CNB npm + npmjs.org（TS CLI） | 内置 `${CNB_TOKEN}` / `NPMJS_TOKEN` |
 
 tag 必须打在包含发布配置的 `main` 提交上（CNB 按 tag 所指提交读取 `.cnb.yml`）。
 两个 job 都会先校验版本、再 `npm view` 做幂等跳过，发布完成后从对应制品库安装并跑一次离线查询（`npm run smoke:published`）。
