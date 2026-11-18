@@ -277,7 +277,7 @@ sdks/c/                  C SDK（C11 + libcurl；include/altdatahub_types.h 由�
 sdks/cpp/                C++ SDK（header-only，复用 C 库；不新增生成器产物）
 service/                 能力服务：通用查询 + 离线目录 + Token 注册表（纯标准库）
   Dockerfile / compose.yml / compose.internal.yml / README.md
-  tests/                  零联网 unittest
+  sdks/python/tests/      零联网 unittest
 mcp/                     MCP stdio + Streamable HTTP 双 transport（纯标准库）
 skills/altdatahub-service/   Agent Skill：SKILL.md + 查询脚本 + 目录参考
 openapi/service.yaml     调用方视角的能力级契约（与 openapi.yaml 的 51 个逻辑接口不同）
@@ -330,8 +330,8 @@ CI 的 `ci-contracts` 把快照打成 `docs-snapshot.tar.gz` 作为构建产物�
 ## 开发
 
 ```bash
-python -m pytest tests/ -q --cov=altdatahub   # 覆盖率门禁 95%（CI 强制）
-python -m ruff check sdks/python/ tests/ tools/
+python -m pytest sdks/python/tests/ -q --cov=altdatahub   # 覆盖率门禁 95%（CI 强制）
+python -m ruff check sdks/python/ tools/
 python tools/gen_code.py --check              # 生成物必须与目录一致（CI 也跑）
 cd sdks/java && mvn verify                    # 改生成器后 Java 侧也要跑（67 个用例）
 cd sdks/go && gofmt -l . && go test ./...     # Go 侧（79 个用例）

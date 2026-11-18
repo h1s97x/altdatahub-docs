@@ -16,7 +16,7 @@ openapi/openapi.yaml                    唯一 POST 入口 + 51 个 schema（0 e
 catalog/PRODUCTS.md                     人读速查表
 ```
 
-任何一环都不许手改下游产物：`tests/test_generated.py` 会重跑生成器并比对。
+任何一环都不许手改下游产物：`sdks/python/tests/test_generated.py` 会重跑生成器并比对。
 
 ## 分册版本
 
@@ -61,7 +61,7 @@ catalog/PRODUCTS.md                     人读速查表
 3. `python tools/verify.py diff /tmp/products-old.json` —— 删产品 / 删字段 / 改类型会标红，
    必须人工确认是「分册真的改了」；新增字段只提示不报错；
 4. `python tools/gen_code.py`；
-5. `python -m pytest tests/ -q`；
+5. `python -m pytest sdks/python/tests/ -q`；
 6. 看 `git diff catalog/products.json` 与 `git diff contract/generated.json`。
    只看产物条数变化不够：顶层字段数从 557 掉到 500 可能是新分册精简，也可能是折行合并失效；
    `generated.json` 的 `publicApi` 摘要能看出公开 API 签名是否变了。

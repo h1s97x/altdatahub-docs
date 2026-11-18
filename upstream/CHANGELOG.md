@@ -40,7 +40,7 @@
 - `/v1/ping` 的 `gateway_contract_status` 由 `pending_real_gateway_validation` 改为
   `partially_validated_s0101`，如实表达「仅 S0101 已验证」；README / AGENTS / transport /
   service / MCP / Skill / C SDK / Web 控制台 / `openapi/service.yaml` 口径同步。
-- `tests/test_integration.py`：真实联调用例（默认被 `integration` marker 排除），只断言结构
+- `sdks/python/tests/test_integration.py`：真实联调用例（默认被 `integration` marker 排除），只断言结构
   不变量（展平 / 强类型 / `raw` / 缺凭据显式失败）；凭据与测试参数全走环境变量，缺则跳过，
   不入库任何真实企业名或证件号。
 
@@ -98,14 +98,14 @@
 - `tools/verify.py`：契约/文档统一门禁（生成物一致性、目录校验、向量消费者、链接、脱敏、
   能力派生一致性、文档快照导出）；`ci-contracts` 跑 `verify.py all` 并打包 `docs-snapshot.tar.gz`。
 - `catalog/schema.json` + `tools/catalog_model.py`：目录形状、类型枚举、必填键成为唯一规则，
-  `extract_catalog.py` / `gen_code.py` / `tests/test_catalog.py` / `verify.py` 共用；
+  `extract_catalog.py` / `gen_code.py` / `sdks/python/tests/test_catalog.py` / `verify.py` 共用；
   子结构字段中文名可留空这一分册事实显式写进规则。
 - `gen_code.py` 产出第 12 份生成物 `contract/generated.json`（11 个产物 sha256、公开 API 签名摘要、
   生成器 sha256、目录计数），生成前先校验真源；未知类型不再静默降级为 `str`。
 - `verify.py catalog` / `diff OLD.json`：目录与英文名映射校验、分册升版语义 diff
   （删产品 / 删字段 / 改类型标红要求人工确认）；升版流程加入「先留旧目录 → diff → 看签名 diff」。
 - `contract/vectors.json` 增加 `meta.authority` 与 `meta.consumers`（7 语言）；
-  `tests/test_verify.py` 覆盖脱敏、计数、链接、目录校验与向量门禁。
+  `sdks/python/tests/test_verify.py` 覆盖脱敏、计数、链接、目录校验与向量门禁。
 - `todo.md`：文档仓、A 方案跨仓同步、部署与后续阶段的排期。
 
 **跨语言一致性（M1）**
@@ -114,9 +114,9 @@
   `PARITY_VECTOR_VERSION` / `PARITY_COVERAGE: all`；`verify.py vectors` 升级为
   case id 唯一性 + 版本/覆盖声明 + 三分组引用的门禁。
 - `contract/mock_gateway.py`（stdlib `http.server`）记录真实 HTTP 报文；
-  `tests/test_wire_parity.py` 用本地 mock 校验 method/path/header/body 与黄金向量一致
+  `sdks/python/tests/test_wire_parity.py` 用本地 mock 校验 method/path/header/body 与黄金向量一致
   （含 UTF-8 中文不转义），无需真实 EDS 凭据。
-- `tests/test_contract_vectors.py` 增加 case id 与期望值完整性的运行时校验。
+- `sdks/python/tests/test_contract_vectors.py` 增加 case id 与期望值完整性的运行时校验。
 - **向量 v2**：补 4 个失败路径/边界 case（码值只出现在描述文本、未知码值不算业务错误、
   `data` 为空对象时报错、多个候选同时存在时按 `DATA_PATHS` 顺序取 `data`），共 24 个 case；
   7 个 consumer 的 PARITY 标记同步升到 2。
@@ -131,7 +131,7 @@
   `mcp/server.py` 的 tools 定义全部改读生成物；双 transport 不变。
 - **M2 收尾**：`service/server.py` 的 `do_GET` / `do_POST` 路径匹配与 `_result` 分派由生成物
   `routes` 装配；`service/tests` 新增端到端用例，证明「只改注册表 + 加一个 handler」即可让
-  HTTP 路由自动可见。`tests/test_capabilities.py` 覆盖注册表结构与派生一致性。
+  HTTP 路由自动可见。`sdks/python/tests/test_capabilities.py` 覆盖注册表结构与派生一致性。
 
 **文档仓与 CI**
 
@@ -164,7 +164,7 @@
   GitHub Pages 上线仍待可见性决策。
 - S2 收尾：`vectors.json` v2 已被 7 语言全量参数化消费，各语言自建 HTTP server 的 wire parity
   降级为可选增强（避免重复投入）；真正的缺口是**重试执行器**——SDK 目前只有 `retryable`
-  标记与 hint，没有实际重试，超时/传输失败分类则已由 `tests/test_http_transport.py` 覆盖。
+  标记与 hint，没有实际重试，超时/传输失败分类则已由 `sdks/python/tests/test_http_transport.py` 覆盖。
 - **A 方案已验证**：内置 `CNB_TOKEN` 能推送到 Private 文档仓；主仓 `main.push` 产生
   `docs: sync snapshot <sha>` 提交（作者 `h1s97x <yang1297656998@outlook.com>`），
   文档仓 CI 自动跑通 `mkdocs build --strict`。
